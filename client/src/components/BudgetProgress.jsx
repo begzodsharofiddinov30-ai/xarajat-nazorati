@@ -1,5 +1,5 @@
 import { CATEGORY_ICONS, CATEGORY_LABELS } from '../utils/categories.js';
-import { formatSom } from '../utils/format.js';
+import { formatSom, groupDigits } from '../utils/format.js';
 import { AlertIcon, CheckIcon } from './icons.jsx';
 
 // Rang hech qachon yolg'iz ishlatilmaydi: har bir holat belgi va matn bilan birga chiqadi.
@@ -39,7 +39,7 @@ export function BudgetProgress({ budget, compact = false, actions }) {
       </div>
       <div className="mt-1 flex justify-between text-xs tabular-nums text-slate-500 dark:text-slate-400">
         <span>
-          {formatSom(spent)} / {formatSom(limit)}
+          {groupDigits(spent)} / {formatSom(limit)}
         </span>
         <span className={remaining < 0 ? 'font-medium text-red-600 dark:text-red-400' : ''}>
           {remaining < 0 ? `${formatSom(-remaining)} ortiqcha` : `${formatSom(remaining)} qoldi`}

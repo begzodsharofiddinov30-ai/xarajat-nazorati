@@ -107,3 +107,31 @@ export const AlertIcon = (p) => (
     <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01" />
   </Icon>
 );
+export const ArrowUpIcon = (p) => (
+  <Icon {...p}>
+    <path d="M12 19V5M5 12l7-7 7 7" />
+  </Icon>
+);
+export const ArrowDownIcon = (p) => (
+  <Icon {...p}>
+    <path d="M12 5v14M19 12l-7 7-7-7" />
+  </Icon>
+);
+export const CalendarIcon = (p) => (
+  <Icon {...p}>
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+  </Icon>
+);
+export const PieIcon = (p) => (
+  <Icon {...p}>
+    <path d="M21.2 15.9A10 10 0 1 1 8 2.8" />
+    <path d="M22 12A10 10 0 0 0 12 2v10z" />
+  </Icon>
+);
+export const TrendIcon = (p) => (
+  <Icon {...p}>
+    <path d="m22 7-8.5 8.5-5-5L2 17" />
+    <path d="M16 7h6v6" />
+  </Icon>
+);

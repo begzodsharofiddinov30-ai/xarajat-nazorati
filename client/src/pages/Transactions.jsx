@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { transactionsApi } from '../api/transactions.js';
+import { Fab } from '../components/Fab.jsx';
 import { DownloadIcon, PlusIcon, SearchIcon } from '../components/icons.jsx';
 import { ConfirmDialog } from '../components/Modal.jsx';
 import { MonthPicker } from '../components/MonthPicker.jsx';
@@ -117,7 +118,7 @@ export default function Transactions() {
           <button className="btn-secondary" onClick={exportCsv} disabled={busy}>
             <DownloadIcon className="h-4 w-4" /> CSV
           </button>
-          <button className="btn-primary" onClick={() => setEditing({})}>
+          <button className="btn-primary hidden md:inline-flex" onClick={() => setEditing({})}>
             <PlusIcon className="h-4 w-4" /> Qo'shish
           </button>
         </div>
@@ -193,6 +194,7 @@ export default function Transactions() {
         </div>
       )}
 
+      <Fab onClick={() => setEditing({})} />
       {editing && (
         <TransactionForm
           initial={editing}

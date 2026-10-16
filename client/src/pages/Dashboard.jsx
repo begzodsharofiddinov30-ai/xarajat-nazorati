@@ -4,25 +4,36 @@ import { budgetsApi } from '../api/budgets.js';
 import { summaryApi } from '../api/summary.js';
 import { transactionsApi } from '../api/transactions.js';
 import { BudgetProgress } from '../components/BudgetProgress.jsx';
-import { CategoryChart } from '../components/charts/CategoryChart.jsx';
+import { CategoryBreakdown } from '../components/charts/CategoryBreakdown.jsx';
 import { DailyChart } from '../components/charts/DailyChart.jsx';
+import { BalanceHero } from '../components/dashboard/BalanceHero.jsx';
+import { InsightCards } from '../components/dashboard/InsightCards.jsx';
+import { WelcomeCard } from '../components/dashboard/WelcomeCard.jsx';
+import { Fab } from '../components/Fab.jsx';
 import { PlusIcon } from '../components/icons.jsx';
 import { MonthPicker } from '../components/MonthPicker.jsx';
-import { StatCard } from '../components/StatCard.jsx';
 import { TransactionForm } from '../components/TransactionForm.jsx';
 import { TransactionItem } from '../components/TransactionItem.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useMonth } from '../context/MonthContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
+import { shiftMonth } from '../utils/month.js';
 
 const STATUS_ORDER = { exceeded: 0, warning: 1, ok: 2 };
 
-function Section({ title, link, children, className = '' }) {
+function Section({ title, subtitle, link, children, className = '' }) {
   return (
     <section className={`card ${className}`}>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-semibold">{title}</h2>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold">{title}</h2>
+          {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
+        </div>
         {link && (
-          <Link to={link.to} className="text-sm font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+          <Link
+            to={link.to}
+            className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+          >
             {link.label}
           </Link>
         )}
@@ -34,7 +45,7 @@ function Section({ title, link, children, className = '' }) {
 
 function ErrorBox({ error, onRetry }) {
   return (
-    <div className="card mb-4 flex items-center justify-between gap-3 border-red-200 text-sm text-red-700 dark:border-red-900 dark:text-red-300">
+    <div className="card flex items-center justify-between gap-3 border-red-200 text-sm text-red-700 dark:border-red-900 dark:text-red-300">
       <span>{error.message}</span>
       <button className="btn-secondary py-1.5" onClick={onRetry}>
         Qayta urinish
@@ -44,10 +55,12 @@ function ErrorBox({ error, onRetry }) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { month } = useMonth();
-  const [formOpen, setFormOpen] = useState(false);
+  const [form, setForm] = useState(null); // null | { type? } — yangi tranzaksiya oynasi
 
   const summary = useAsync(() => summaryApi.get(month), [month]);
+  const previous = useAsync(() => summaryApi.get(shiftMonth(month, -1)), [month]);
   const budgets = useAsync(() => budgetsApi.list(month), [month]);
   const recent = useAsync(() => transactionsApi.list({ month, limit: 5 }), [month]);
 
@@ -58,46 +71,36 @@ export default function Dashboard() {
   };
 
   const s = summary.data;
+  const empty = s && s.transactionCount === 0;
   const topBudgets = [...(budgets.data ?? [])]
     .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || b.percent - a.percent)
     .slice(0, 4);
 
   return (
-    <>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <MonthPicker />
-        <button className="btn-primary" onClick={() => setFormOpen(true)}>
+        <button className="btn-primary hidden md:inline-flex" onClick={() => setForm({})}>
           <PlusIcon className="h-4 w-4" /> Qo'shish
         </button>
       </div>
 
       {summary.error && <ErrorBox error={summary.error} onRetry={reloadAll} />}
 
-      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-        <StatCard label="Daromad" value={s?.income ?? 0} tone="income" loading={!s} />
-        <StatCard label="Xarajat" value={s?.expense ?? 0} loading={!s} />
-        <div className="col-span-2 md:col-span-1">
-          <StatCard label="Balans" value={s?.balance ?? 0} tone={s?.balance < 0 ? 'negative' : 'default'} loading={!s} />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Section title="Kategoriyalar bo'yicha xarajat">
-          {s ? <CategoryChart data={s.byCategory} total={s.expense} /> : <div className="h-48" />}
-        </Section>
-
-        <Section title="Kunlik xarajatlar">
-          {s ? <DailyChart data={s.daily} /> : <div className="h-56" />}
-        </Section>
-
-        <Section title="Budjetlar" link={{ to: '/budgets', label: 'Barchasi' }}>
+      <div className={`grid gap-4 ${empty ? '' : 'lg:grid-cols-[1.4fr_1fr]'}`}>
+        <BalanceHero name={user?.name} month={month} summary={s} />
+        {!empty && (
+        <Section title="Budjetlar" subtitle="Oylik limitlar holati" link={{ to: '/budgets', label: 'Barchasi' }}>
           {budgets.data?.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">
-              Hali limit qo'yilmagan.{' '}
-              <Link to="/budgets" className="font-medium text-emerald-600 dark:text-emerald-400">
+            <div className="flex h-full flex-col items-center justify-center py-4 text-center">
+              <span className="text-3xl" aria-hidden="true">🎯</span>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Limit qo'ysangiz, oshib ketishidan oldin ogohlantiramiz.
+              </p>
+              <Link to="/budgets" className="btn-secondary mt-3 py-1.5">
                 Limit qo'yish
               </Link>
-            </p>
+            </div>
           ) : (
             <div className="space-y-4">
               {topBudgets.map((b) => (
@@ -106,21 +109,37 @@ export default function Dashboard() {
             </div>
           )}
         </Section>
+        )}
+      </div>
 
-        <Section title="So'nggi tranzaksiyalar" link={{ to: '/transactions', label: 'Barchasi' }}>
-          {recent.data?.data.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">Bu oyda tranzaksiya yo'q</p>
-          ) : (
+      {empty ? (
+        <WelcomeCard onAddIncome={() => setForm({ type: 'income', category: 'salary' })} onAddExpense={() => setForm({})} />
+      ) : (
+        <>
+          <InsightCards month={month} summary={s} previous={previous.data} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Section title="Kategoriyalar" subtitle="Bu oydagi xarajatlar taqsimoti">
+              {s ? <CategoryBreakdown data={s.byCategory} total={s.expense} /> : <div className="h-48" />}
+            </Section>
+
+            <Section title="Kunlik xarajatlar" subtitle="Har bir kun bo'yicha">
+              {s ? <DailyChart data={s.daily} /> : <div className="h-56" />}
+            </Section>
+          </div>
+
+          <Section title="So'nggi tranzaksiyalar" link={{ to: '/transactions', label: 'Barchasi' }}>
             <ul className="-my-3 divide-y divide-slate-100 dark:divide-slate-800">
               {recent.data?.data.map((tx) => (
                 <TransactionItem key={tx.id} tx={tx} />
               ))}
             </ul>
-          )}
-        </Section>
-      </div>
+          </Section>
+        </>
+      )}
 
-      {formOpen && <TransactionForm onClose={() => setFormOpen(false)} onSaved={reloadAll} />}
-    </>
+      <Fab onClick={() => setForm({})} />
+      {form && <TransactionForm initial={form} onClose={() => setForm(null)} onSaved={reloadAll} />}
+    </div>
   );
 }
