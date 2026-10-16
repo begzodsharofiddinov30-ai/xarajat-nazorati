@@ -1,5 +1,5 @@
 # Render Blueprint: Render.com → New → Blueprint → shu repozitoriyni tanlang.
-# MONGO_URI va CLIENT_URL ni Render panelida qo'lda kiritasiz, JWT_SECRET avtomatik yaratiladi.
+# MONGO_URI ni Render panelida qo'lda kiritasiz, JWT_SECRET avtomatik yaratiladi.
 services:
   - type: web
     name: xarajat-nazorati
@@ -21,5 +21,6 @@ services:
         generateValue: true
       - key: MONGO_URI
         sync: false
+      # Frontend va API bitta domenda, shuning uchun CORS faqat zaxira sifatida.
       - key: CLIENT_URL
-        sync: false
+        value: https://xarajat-nazorati.onrender.com
