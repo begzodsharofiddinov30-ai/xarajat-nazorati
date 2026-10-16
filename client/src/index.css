@@ -79,3 +79,72 @@ body {
 @utility btn-icon {
   @apply inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100;
 }
+
+/* ---------- Harakatlanuvchi fon ---------- */
+.bg-blob {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 9999px;
+  will-change: transform;
+  opacity: 0.35;
+}
+.dark .bg-blob {
+  opacity: 0.55;
+}
+.bg-blob-1 {
+  top: -30vmax;
+  left: -20vmax;
+  background: radial-gradient(circle at center, rgb(220 38 38 / 0.55), transparent 60%);
+  animation: blob-drift-1 28s ease-in-out infinite alternate;
+}
+.bg-blob-2 {
+  bottom: -35vmax;
+  right: -25vmax;
+  background: radial-gradient(circle at center, rgb(153 27 27 / 0.6), transparent 60%);
+  animation: blob-drift-2 34s ease-in-out infinite alternate;
+}
+.bg-blob-3 {
+  top: 30%;
+  left: 40%;
+  width: 45vmax;
+  height: 45vmax;
+  background: radial-gradient(circle at center, rgb(239 68 68 / 0.35), transparent 60%);
+  animation: blob-drift-3 22s ease-in-out infinite alternate;
+}
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(127 127 127 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(127 127 127 / 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 75%);
+  animation: grid-pan 40s linear infinite;
+}
+
+@keyframes blob-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(18vw, 12vh) scale(1.15); }
+  100% { transform: translate(6vw, 28vh) scale(0.95); }
+}
+@keyframes blob-drift-2 {
+  0% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-22vw, -10vh) scale(0.9); }
+  100% { transform: translate(-8vw, -26vh) scale(1.1); }
+}
+@keyframes blob-drift-3 {
+  0% { transform: translate(0, 0) scale(0.9); }
+  100% { transform: translate(-30vw, -20vh) scale(1.2); }
+}
+@keyframes grid-pan {
+  from { background-position: 0 0; }
+  to { background-position: 48px 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-blob,
+  .bg-grid {
+    animation: none;
+  }
+}
