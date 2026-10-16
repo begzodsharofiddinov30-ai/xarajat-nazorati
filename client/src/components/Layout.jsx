@@ -25,7 +25,7 @@ export function Layout() {
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-4 px-4">
           <NavLink to="/" className="flex items-center gap-2 font-bold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white">X</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">X</span>
             <span className="hidden sm:inline">Xarajat Nazorati</span>
           </NavLink>
 
@@ -75,7 +75,7 @@ export function Layout() {
               end={end}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium ${
-                  isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'
+                  isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-500 dark:text-slate-400'
                 }`
               }
             >

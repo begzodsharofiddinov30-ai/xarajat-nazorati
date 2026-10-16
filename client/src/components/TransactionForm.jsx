@@ -102,7 +102,7 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
                 aria-pressed={form.category === c}
                 className={`flex flex-col items-center gap-1 rounded-xl border px-1 py-2 text-xs font-medium transition ${
                   form.category === c
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300'
+                    ? 'border-brand-500 bg-brand-50 text-brand-800 dark:bg-brand-500/10 dark:text-brand-300'
                     : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
                 }`}
               >

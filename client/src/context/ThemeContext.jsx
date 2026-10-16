@@ -6,7 +6,7 @@ const ORDER = ['system', 'light', 'dark'];
 const media = () => window.matchMedia('(prefers-color-scheme: dark)');
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => getItem('xn_theme') || 'system');
+  const [theme, setTheme] = useState(() => getItem('xn_theme') || 'dark');
 
   useEffect(() => {
     const apply = () => {

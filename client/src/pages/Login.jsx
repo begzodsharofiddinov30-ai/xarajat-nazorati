@@ -31,7 +31,7 @@ export default function Login() {
       footer={
         <>
           Hisobingiz yo'qmi?{' '}
-          <Link to="/register" className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">
+          <Link to="/register" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
             Ro'yxatdan o'ting
           </Link>
         </>

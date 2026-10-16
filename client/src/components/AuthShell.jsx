@@ -13,7 +13,7 @@ export function AuthShell({ title, subtitle, children, footer }) {
       </button>
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-xl font-bold text-white">
+          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-xl font-bold text-white">
             X
           </span>
           <h1 className="text-2xl font-bold">{title}</h1>

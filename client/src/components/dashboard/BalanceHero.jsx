@@ -28,7 +28,7 @@ export function BalanceHero({ name, month, summary }) {
   const firstName = name?.split(' ')[0];
 
   if (!summary) {
-    return <div className="h-56 animate-pulse rounded-3xl bg-emerald-600/20 dark:bg-emerald-900/30" />;
+    return <div className="h-56 animate-pulse rounded-3xl bg-brand-600/20 dark:bg-brand-900/30" />;
   }
 
   const { income, expense, balance } = summary;
@@ -36,10 +36,10 @@ export function BalanceHero({ name, month, summary }) {
   const spentRatio = income > 0 ? Math.min(expense / income, 1) : expense > 0 ? 1 : 0;
 
   return (
-    <section className="relative flex flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-5 text-white shadow-lg shadow-emerald-900/20 sm:p-6 dark:from-emerald-800 dark:via-emerald-900 dark:to-teal-950 dark:shadow-none">
+    <section className="relative flex flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-800 to-neutral-950 p-5 text-white shadow-lg shadow-brand-900/30 sm:p-6 dark:from-brand-700 dark:via-brand-950 dark:to-black dark:ring-1 dark:ring-brand-900/60 dark:shadow-none">
       {/* Fondagi bezak doiralari */}
       <div className="pointer-events-none absolute -top-16 -right-10 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-teal-300/20 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-brand-400/20 blur-2xl" />
 
       <div className="relative flex flex-1 flex-col">
         <p className="text-sm text-white/80">

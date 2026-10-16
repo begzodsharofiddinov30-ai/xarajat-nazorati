@@ -36,7 +36,7 @@ export default function Register() {
       footer={
         <>
           Hisobingiz bormi?{' '}
-          <Link to="/login" className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400">
+          <Link to="/login" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
             Kirish
           </Link>
         </>

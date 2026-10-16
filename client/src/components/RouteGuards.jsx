@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 export function FullScreenSpinner() {
   return (
     <div className="flex min-h-dvh items-center justify-center" role="status" aria-label="Yuklanmoqda">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-600 dark:border-slate-800" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-brand-600 dark:border-slate-800" />
     </div>
   );
 }
