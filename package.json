@@ -1,0 +1,16 @@
+{
+  "name": "xarajat-nazorati",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shaxsiy xarajatlarni nazorat qilish ilovasi (React + Express + MongoDB)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install:all": "npm ci --prefix server && npm ci --prefix client",
+    "build": "npm ci --prefix server --omit=dev && npm ci --prefix client --include=dev && npm run build --prefix client",
+    "start": "npm start --prefix server",
+    "test": "npm test --prefix server",
+    "seed": "npm run seed --prefix server"
+  }
+}

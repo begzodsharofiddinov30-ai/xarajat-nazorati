@@ -1,0 +1,25 @@
+# Render Blueprint: Render.com → New → Blueprint → shu repozitoriyni tanlang.
+# MONGO_URI va CLIENT_URL ni Render panelida qo'lda kiritasiz, JWT_SECRET avtomatik yaratiladi.
+services:
+  - type: web
+    name: xarajat-nazorati
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
