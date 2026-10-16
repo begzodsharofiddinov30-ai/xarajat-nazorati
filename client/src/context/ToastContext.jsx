@@ -18,7 +18,8 @@ export function ToastProvider({ children }) {
   const show = useCallback(
     (message, type = 'success') => {
       const id = nextId.current++;
-      setToasts((list) => [...list.slice(-2), { id, message, type }]);
+      // Telefonda ustma-ust bildirishnomalar sahifani yopmasligi uchun faqat oxirgisi ko'rsatiladi.
+      setToasts([{ id, message, type }]);
       setTimeout(() => dismiss(id), type === 'warning' ? 8000 : 4000);
     },
     [dismiss],

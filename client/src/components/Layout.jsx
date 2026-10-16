@@ -62,7 +62,7 @@ export function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pb-10">
+      <main className="mx-auto max-w-5xl px-4 pt-5 pb-44 md:pb-10">
         <Outlet />
       </main>
 

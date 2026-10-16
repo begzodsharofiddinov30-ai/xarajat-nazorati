@@ -51,11 +51,11 @@ export function Modal({ title, onClose, children }) {
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl outline-none dark:bg-slate-900 sm:max-w-md sm:rounded-2xl sm:pb-5"
+        className="relative max-h-[92dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl outline-none dark:bg-slate-900 sm:max-w-md sm:rounded-2xl sm:pb-5"
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 -mx-5 mb-4 flex items-center justify-between bg-white px-5 pt-5 pb-3 dark:bg-slate-900">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <button className="btn-icon" onClick={onClose} aria-label="Yopish">
+          <button className="btn-icon" onClick={onClose} aria-label="Oynani yopish">
             <XIcon />
           </button>
         </div>

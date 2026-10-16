@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { CATEGORY_ICONS, CATEGORY_LABELS, categoriesFor } from '../utils/categories.js';
 import { todayStr } from '../utils/month.js';
 import { AmountInput } from './AmountInput.jsx';
+import { TrashIcon } from './icons.jsx';
 import { Modal } from './Modal.jsx';
 
 function FieldError({ children }) {
@@ -149,19 +150,20 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
         <FieldError>{errors.form}</FieldError>
 
         <div className="flex gap-2 pt-1">
-          {editing && onDelete ? (
+          {editing && onDelete && (
             <button
               type="button"
-              className="btn-secondary flex-1 text-red-600 dark:text-red-400"
+              className="btn-secondary px-3 text-red-600 dark:text-red-400"
               onClick={() => onDelete(initial)}
+              aria-label="O'chirish"
+              title="O'chirish"
             >
-              O'chirish
-            </button>
-          ) : (
-            <button type="button" className="btn-secondary flex-1" onClick={onClose}>
-              Bekor qilish
+              <TrashIcon className="h-5 w-5" />
             </button>
           )}
+          <button type="button" className="btn-secondary flex-1" onClick={onClose}>
+            Bekor qilish
+          </button>
           <button type="submit" className="btn-primary flex-1" disabled={busy}>
             {busy ? 'Saqlanmoqda…' : 'Saqlash'}
           </button>
