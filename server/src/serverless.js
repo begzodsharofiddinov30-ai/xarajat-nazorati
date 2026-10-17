@@ -28,5 +28,11 @@ export default async function handler(req, res) {
     res.end(JSON.stringify({ error: { message: "Server vaqtincha ishlamayapti", code: 'DB_UNAVAILABLE' } }));
     return;
   }
+  // vercel.json dagi rewrite (/api/:path* -> /api) so'rovga ?path=... qo'shadi; ilovaga asl so'rov yetib borishi uchun olib tashlanadi.
+  const url = new URL(req.url, 'http://localhost');
+  if (url.searchParams.has('path')) {
+    url.searchParams.delete('path');
+    req.url = url.pathname + url.search;
+  }
   return app(req, res);
 }
