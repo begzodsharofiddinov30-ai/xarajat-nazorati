@@ -1,5 +1,6 @@
 # Android APK (TWA) ni yig'adi va GitHub Release sifatida chiqaradi.
-# Yuklab olish havolasi doim oxirgi versiyaga olib boradi:
+# Yuklab olish havolalari doim oxirgi versiyaga olib boradi:
+#   https://xarajat-nazorati.vercel.app/download/xarajat-nazorati.apk (asosiy)
 #   https://github.com/begzodsharofiddinov30-ai/xarajat-nazorati/releases/latest/download/xarajat-nazorati.apk
 # Faqat android/ papkasi o'zgarganda ishga tushadi: sayt yangilanishlari ilovaga o'zi yetib boradi.
 name: Android APK
@@ -56,6 +57,17 @@ jobs:
           grep -q "SHA-256 digest: $EXPECTED_CERT_SHA256" certs.txt
           cp "$APK" xarajat-nazorati.apk
           rm -f "$RUNNER_TEMP/release.p12"
+
+      # Saytdagi /download/xarajat-nazorati.apk ni yangilaydi (Vercel shu commit'dan keyin o'zi deploy qiladi).
+      - name: APK ni saytga joylash
+        run: |
+          cp xarajat-nazorati.apk client/public/download/xarajat-nazorati.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add client/public/download/xarajat-nazorati.apk
+          git diff --cached --quiet || git commit -m "Android APK 1.0.${{ github.run_number }} saytga joylandi"
+          git pull --rebase origin main
+          git push origin HEAD:main
 
       - name: GitHub Release
         env:

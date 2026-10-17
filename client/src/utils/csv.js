@@ -1,8 +1,12 @@
 import { CATEGORY_LABELS, TYPE_LABELS } from './categories.js';
 
+// Ajratuvchi ";": O'zbekiston/Rossiya sozlamalaridagi Excel vergulli faylni bitta ustunga yopishtirib ochadi.
+// Ilovaning o'z importi (csvImport.js) "," va ";" ni o'zi aniqlaydi.
+const SEP = ';';
+
 function cell(value) {
   const s = String(value ?? '');
-  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return /[";,\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 export function transactionsToCsv(transactions) {
@@ -14,7 +18,7 @@ export function transactionsToCsv(transactions) {
     t.type === 'expense' ? -t.amount : t.amount,
     t.note,
   ]);
-  return [header, ...rows].map((r) => r.map(cell).join(',')).join('\r\n');
+  return [header, ...rows].map((r) => r.map(cell).join(SEP)).join('\r\n');
 }
 
 export function downloadCsv(filename, csv) {

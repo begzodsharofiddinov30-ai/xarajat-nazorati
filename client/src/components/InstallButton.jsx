@@ -19,9 +19,9 @@ const Key = ({ children }) => (
   <b className="rounded-md bg-slate-100 px-1.5 py-0.5 font-semibold dark:bg-slate-800">{children}</b>
 );
 
-// Android APK: GitHub Actions yig'adi (.github/workflows/android.yml), havola doim oxirgi versiyaga olib boradi.
-export const APK_URL =
-  'https://github.com/begzodsharofiddinov30-ai/xarajat-nazorati/releases/latest/download/xarajat-nazorati.apk';
+// Android APK: GitHub Actions yig'adi (.github/workflows/android.yml) va shu saytga joylaydi.
+// O'z domenimizdan to'g'ri Content-Type bilan beriladi (vercel.json), shunda telefon uni ilova sifatida o'rnatadi.
+export const APK_URL = '/download/xarajat-nazorati.apk';
 const isAndroid = () => /Android/i.test(navigator.userAgent);
 
 // Telefon tili o'zbekcha, ruscha yoki inglizcha bo'lishi mumkin, shuning uchun menyu nomlari uch tilda.
