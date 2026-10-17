@@ -35,11 +35,29 @@ export function createApp() {
   app.disable('x-powered-by');
   if (env.TRUST_PROXY) app.set('trust proxy', env.TRUST_PROXY);
 
-  app.use(helmet());
+  // Google orqali kirish (accounts.google.com/gsi) uchun Google talab qiladigan istisnolar:
+  // skript, iframe va uslublar shu manzildan; popup oynasi bilan aloqa (COOP) va referrer.
+  const GSI = 'https://accounts.google.com/gsi/';
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          'script-src': ["'self'", `${GSI}client`],
+          'frame-src': ["'self'", GSI],
+          'connect-src': ["'self'", GSI],
+          'style-src': ["'self'", 'https:', "'unsafe-inline'"],
+        },
+      },
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    }),
+  );
   app.use(cors({ origin: env.CLIENT_URL.split(',').map((s) => s.trim()) }));
   // Import bitta so'rovda 1000 tagacha qator yuboradi, shuning uchun faqat shu yo'lga kattaroq limit.
   app.use('/api/transactions/import', express.json({ limit: '1mb' }));
   app.use(express.json({ limit: '100kb' }));
+  // Google redirect usuli formani application/x-www-form-urlencoded ko'rinishida yuboradi.
+  app.use('/api/auth/google/redirect', express.urlencoded({ extended: false, limit: '10kb' }));
 
   app.get('/api/health', (_req, res) => {
     const db = mongoose.connection.readyState === 1;

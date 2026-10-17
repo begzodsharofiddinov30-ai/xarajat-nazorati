@@ -94,6 +94,7 @@ Vercel loyihasidagi muhit o'zgaruvchilari (Settings → Environment Variables):
 | `JWT_SECRET` | Kamida 32 belgi: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Kalit kuchsiz bo'lsa yoki namunadagi qiymat qolsa, server ishga tushmaydi |
 | `TRUST_PROXY` | `1`: rate limit foydalanuvchining haqiqiy IP manzili bo'yicha ishlaydi |
 | `JWT_EXPIRES_IN` | `7d` |
+| `GOOGLE_CLIENT_ID` | Google Cloud'dagi OAuth Client ID (Web). Bo'sh bo'lsa, "Google bilan kirish" tugmasi ko'rinmaydi |
 
 Frontend va API bitta domenda, shuning uchun `CLIENT_URL` (CORS) kerak emas. Qo'lda deploy qilish: ildiz papkada `vercel deploy --prod`.
 
@@ -174,6 +175,7 @@ Barcha himoyalangan endpoint'lar `Authorization: Bearer <token>` sarlavhasini ta
 - **Prognoz** (`server/src/utils/forecast.js`). Takroriy to'lovlar (ijara, obuna) tempga ko'paytirilmaydi. Qolgan ("o'zgaruvchan") xarajatlar bugungacha bo'lgan kunlik o'rtacha bo'yicha oy oxirigacha davom etadi, oxirida hali yaratilmagan takroriy to'lovlar qo'shiladi. Formula: `hozirgacha + kunlik o'rtacha × qolgan kunlar + kutilayotgan takroriy`. Oyning dastlabki kunlarida prognoz kam aniq (`confidence: low`). Klient o'zining mahalliy sanasini `today` bilan yuboradi, shuning uchun soat poyasi farqi (Toshkent UTC+5) hisobni siljitmaydi.
 - **Takroriy tranzaksiyalar** alohida rejalashtiruvchi (cron) talab qilmaydi: ma'lumot o'qiladigan so'rovlardan oldin yetishmayotgan yozuvlar yaratiladi. Serverless muhitda doimiy ishlaydigan jarayon yo'q, shunday bo'lsa ham hech narsa o'tib ketmaydi. `(user, recurring, date)` bo'yicha unikal indeks bir kunga ikki marta yozishga yo'l qo'ymaydi. Server sanasi UTC bo'yicha, shuning uchun Toshkentda yozuv ertalab soat 05:00 da paydo bo'ladi.
 - **O'z kategoriyalar.** Tranzaksiyada kalit sifatida `c_<id>` saqlanadi. Ishlatilayotgan kategoriya o'chirilmaydi, shunda eski yozuvlar nomsiz qolmaydi.
+- **Google orqali kirish** (Google Identity Services). Kirish sahifasida qurilmadagi Google akkauntlar o'zi taklif qilinadi (One Tap), tugma esa akkaunt tanlash oynasini ochadi. Server ID tokenni Google'ning ochiq kalitlari bilan qo'shimcha paketsiz tekshiradi (`server/src/utils/googleToken.js`), faqat tasdiqlangan emaillar qabul qilinadi. Shu emaildagi mavjud hisobga bog'lanadi. Bunda email avval tasdiqlanmagan bo'lsa, eski parol va sessiyalar bekor qilinadi: begona emailni oldindan band qilib hisobni egallab olishning oldi olinadi. O'rnatilgan ilovada (iPhone bosh ekrani, Android ilova) popup o'rniga redirect usuli ishlatiladi (`POST /api/auth/google/redirect`, CSRF tekshiruvi bilan).
 - **Sessiyalar.** JWT ichida `ver` bor va u foydalanuvchining `tokenVersion` i bilan solishtiriladi: parol almashtirilganda yoki "boshqa qurilmalardan chiqish" bosilganda eski tokenlar darhol yaroqsiz bo'ladi.
 - **CSV import** qatorlarni alohida tekshiradi: yaroqlilari saqlanadi, yaroqsizlari sabab bilan qaytadi. Takrorlar (sana, tur, summa, kategoriya va izohi bir xil) o'tkazib yuboriladi, shuning uchun bir faylni ikki marta yuklash xavfsiz.
 - **Maqsadlar** tranzaksiyalar va balansga ta'sir qilmaydi: jamg'arma yozuvlari faqat shu maqsad uchun hisoblanadi.

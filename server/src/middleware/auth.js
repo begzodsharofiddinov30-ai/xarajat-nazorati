@@ -15,7 +15,7 @@ export async function requireAuth(req, _res, next) {
   }
 
   // Foydalanuvchi o'chirilgan bo'lsa, eski token ishlamasligi kerak.
-  const user = await User.findById(payload.sub);
+  const user = await User.findById(payload.sub).select('+passwordHash');
   if (!user) throw ApiError.unauthorized("Sessiya muddati tugagan yoki token noto'g'ri", 'INVALID_TOKEN');
 
   // Parol almashtirilgan yoki "hamma qurilmadan chiqish" bosilgan bo'lsa, eski token yaroqsiz.
@@ -23,6 +23,12 @@ export async function requireAuth(req, _res, next) {
     throw ApiError.unauthorized("Sessiya muddati tugagan yoki token noto'g'ri", 'INVALID_TOKEN');
   }
 
-  req.user = { id: user.id, name: user.name, email: user.email };
+  req.user = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    hasPassword: Boolean(user.passwordHash),
+    google: Boolean(user.googleId),
+  };
   next();
 }

@@ -9,6 +9,7 @@ export default defineConfig({
       JWT_SECRET: 'test-secret-key-at-least-16-chars',
       MONGO_URI: 'mongodb://unused-in-tests',
       CLIENT_URL: 'http://localhost:5173',
+      GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
     },
     // Birinchi ishga tushirishda mongodb-memory-server MongoDB binarini yuklab oladi.
     hookTimeout: 120_000,

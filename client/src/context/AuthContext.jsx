@@ -4,12 +4,26 @@ import { getToken, onUnauthorized, setToken } from '../api/client.js';
 
 const AuthContext = createContext(null);
 
+// Google redirect usulidan qaytganda server tokenni URL fragmentida beradi (#token=...).
+// Token darhol saqlanib, manzildan o'chiriladi (tarixda va ulashilgan havolada qolmasligi uchun).
+function consumeRedirectToken() {
+  const m = /[#&]token=([^&]+)/.exec(window.location.hash);
+  if (!m) return;
+  setToken(decodeURIComponent(m[1]));
+  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   // 'loading' — token tekshirilmoqda; 'authed'; 'guest'; 'offline' — server bilan aloqa yo'q
-  const [status, setStatus] = useState(() => (getToken() ? 'loading' : 'guest'));
+  const [status, setStatus] = useState(() => {
+    consumeRedirectToken();
+    return getToken() ? 'loading' : 'guest';
+  });
 
   const logout = useCallback(() => {
+    // Chiqqandan keyin Google akkaunt avtomatik qayta tanlanmasin.
+    window.google?.accounts?.id?.disableAutoSelect();
     setToken(null);
     setUser(null);
     setStatus('guest');
@@ -59,6 +73,7 @@ export function AuthProvider({ children }) {
       status,
       login: async (body) => finish(await authApi.login(body)),
       register: async (body) => finish(await authApi.register(body)),
+      loginWithGoogle: async (credential) => finish(await authApi.google(credential)),
       logout,
       retry: checkSession,
       updateUser,

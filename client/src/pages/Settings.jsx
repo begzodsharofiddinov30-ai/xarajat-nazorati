@@ -59,7 +59,9 @@ function ProfileCard() {
 }
 
 function PasswordCard() {
-  const { replaceSession } = useAuth();
+  const { user, replaceSession, updateUser } = useAuth();
+  // Faqat Google orqali ochilgan hisobda hali parol yo'q: birinchi parol joriy parolsiz o'rnatiladi.
+  const hasPassword = user?.hasPassword !== false;
   const toast = useToast();
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [errors, setErrors] = useState({});
@@ -73,9 +75,18 @@ function PasswordCard() {
     setBusy(true);
     setErrors({});
     try {
-      replaceSession(await authApi.changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword }));
+      const session = await authApi.changePassword({
+        ...(hasPassword && { currentPassword: form.currentPassword }),
+        newPassword: form.newPassword,
+      });
+      replaceSession(session);
+      updateUser(session.user);
       setForm({ currentPassword: '', newPassword: '', confirm: '' });
-      toast("Parol o'zgartirildi. Boshqa qurilmalardagi sessiyalar tugatildi");
+      toast(
+        hasPassword
+          ? "Parol o'zgartirildi. Boshqa qurilmalardagi sessiyalar tugatildi"
+          : "Parol o'rnatildi. Endi email va parol bilan ham kirishingiz mumkin",
+      );
     } catch (err) {
       setErrors(err.code === 'VALIDATION_ERROR' ? err.fieldErrors : { form: err.message });
     } finally {
@@ -85,15 +96,22 @@ function PasswordCard() {
 
   return (
     <section className="card">
-      <h2 className="mb-3 font-semibold">Parolni almashtirish</h2>
+      <h2 className="mb-3 font-semibold">{hasPassword ? 'Parolni almashtirish' : "Parol o'rnatish"}</h2>
+      {!hasPassword && (
+        <p className="-mt-1 mb-3 text-sm text-slate-500 dark:text-slate-400">
+          Hisobingiz Google orqali ochilgan. Parol o'rnatsangiz, email va parol bilan ham kira olasiz.
+        </p>
+      )}
       <form onSubmit={submit} className="space-y-3" noValidate>
-        <div>
-          <label className="label" htmlFor="p-current">
-            Joriy parol
-          </label>
-          <input id="p-current" type="password" autoComplete="current-password" className="input" value={form.currentPassword} onChange={set('currentPassword')} />
-          <FieldError>{errors.currentPassword}</FieldError>
-        </div>
+        {hasPassword && (
+          <div>
+            <label className="label" htmlFor="p-current">
+              Joriy parol
+            </label>
+            <input id="p-current" type="password" autoComplete="current-password" className="input" value={form.currentPassword} onChange={set('currentPassword')} />
+            <FieldError>{errors.currentPassword}</FieldError>
+          </div>
+        )}
         <div>
           <label className="label" htmlFor="p-new">
             Yangi parol
@@ -109,8 +127,8 @@ function PasswordCard() {
           <FieldError>{errors.confirm}</FieldError>
         </div>
         <FieldError>{errors.form}</FieldError>
-        <button className="btn-primary" disabled={busy || !form.currentPassword || !form.newPassword}>
-          {busy ? 'Saqlanmoqda…' : "Parolni o'zgartirish"}
+        <button className="btn-primary" disabled={busy || (hasPassword && !form.currentPassword) || !form.newPassword}>
+          {busy ? 'Saqlanmoqda…' : hasPassword ? "Parolni o'zgartirish" : "Parol o'rnatish"}
         </button>
       </form>
     </section>
@@ -171,7 +189,8 @@ function InstallCard() {
 }
 
 function DeleteAccount() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const hasPassword = user?.hasPassword !== false;
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState('');
@@ -183,11 +202,11 @@ function DeleteAccount() {
     setBusy(true);
     setError('');
     try {
-      await authApi.deleteAccount({ password });
+      await authApi.deleteAccount(hasPassword ? { password } : { confirmEmail: password });
       toast("Hisob o'chirildi");
       logout();
     } catch (err) {
-      setError(err.fieldErrors?.password ?? err.message);
+      setError(err.fieldErrors?.password ?? err.fieldErrors?.confirmEmail ?? err.message);
       setBusy(false);
     }
   }
@@ -205,12 +224,18 @@ function DeleteAccount() {
       {open && (
         <Modal title="Hisobni o'chirish" onClose={() => setOpen(false)}>
           <form onSubmit={submit} className="space-y-4" noValidate>
-            <p className="text-sm text-slate-600 dark:text-slate-300">Tasdiqlash uchun parolingizni kiriting.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {hasPassword ? 'Tasdiqlash uchun parolingizni kiriting.' : `Tasdiqlash uchun emailingizni yozing: ${user?.email}`}
+            </p>
             <div>
               <label className="label" htmlFor="d-password">
-                Parol
+                {hasPassword ? 'Parol' : 'Email'}
               </label>
-              <input id="d-password" type="password" autoComplete="current-password" className="input" value={password} autoFocus onChange={(e) => setPassword(e.target.value)} />
+              {hasPassword ? (
+                <input id="d-password" type="password" autoComplete="current-password" className="input" value={password} autoFocus onChange={(e) => setPassword(e.target.value)} />
+              ) : (
+                <input id="d-password" type="email" autoComplete="off" className="input" value={password} autoFocus onChange={(e) => setPassword(e.target.value)} />
+              )}
               <FieldError>{error}</FieldError>
             </div>
             <div className="flex gap-2">

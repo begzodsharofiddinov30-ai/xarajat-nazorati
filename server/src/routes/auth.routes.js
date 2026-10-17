@@ -3,7 +3,10 @@ import rateLimit from 'express-rate-limit';
 import { env } from '../config/env.js';
 import {
   changePassword,
+  authConfig,
   deleteAccount,
+  googleLogin,
+  googleRedirect,
   login,
   logoutAll,
   me,
@@ -15,6 +18,7 @@ import { validate } from '../middleware/validate.js';
 import {
   changePasswordSchema,
   deleteAccountSchema,
+  googleSchema,
   loginSchema,
   profileSchema,
   registerSchema,
@@ -34,6 +38,9 @@ const router = Router();
 
 router.post('/register', authLimiter, validate({ body: registerSchema }), register);
 router.post('/login', authLimiter, validate({ body: loginSchema }), login);
+router.get('/config', authConfig);
+router.post('/google', authLimiter, validate({ body: googleSchema }), googleLogin);
+router.post('/google/redirect', authLimiter, googleRedirect);
 router.get('/me', requireAuth, me);
 router.patch('/profile', requireAuth, validate({ body: profileSchema }), updateProfile);
 router.post('/password', requireAuth, authLimiter, validate({ body: changePasswordSchema }), changePassword);

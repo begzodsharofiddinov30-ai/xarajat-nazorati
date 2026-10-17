@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { AuthShell, FormField } from '../components/AuthShell.jsx';
+import { GoogleSignIn } from '../components/GoogleSignIn.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Register() {
@@ -42,7 +43,8 @@ export default function Register() {
         </>
       }
     >
-      <form onSubmit={submit} className="space-y-4" noValidate>
+      <GoogleSignIn dividerText="yoki email bilan ro'yxatdan o'ting" />
+      <form onSubmit={submit} className="mt-4 space-y-4" noValidate>
         <FormField id="name" label="Ism" autoComplete="name" value={form.name} onChange={set('name')} error={errors.name} required />
         <FormField id="email" label="Email" type="email" autoComplete="email" value={form.email} onChange={set('email')} error={errors.email} required />
         <FormField

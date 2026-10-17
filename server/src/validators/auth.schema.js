@@ -13,12 +13,19 @@ export const registerSchema = z.object({ name, email, password: newPassword });
 
 export const profileSchema = z.object({ name });
 
+// Faqat Google orqali ochilgan (paroli yo'q) hisobda joriy parol so'ralmaydi: controller tekshiradi.
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Joriy parolni kiriting'),
+  currentPassword: z.string().optional(),
   newPassword,
 });
 
-export const deleteAccountSchema = z.object({ password: z.string().min(1, 'Parolni kiriting') });
+// Paroli bor hisob parol bilan, paroli yo'q (Google) hisob emailini yozib tasdiqlaydi.
+export const deleteAccountSchema = z.object({
+  password: z.string().optional(),
+  confirmEmail: z.string().trim().toLowerCase().optional(),
+});
+
+export const googleSchema = z.object({ credential: z.string().min(20).max(5000) });
 
 export const loginSchema = z.object({
   email,

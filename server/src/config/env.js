@@ -13,6 +13,8 @@ const schema = z
     CLIENT_URL: z.string().default('http://localhost:5173'),
     // Vercel, Nginx kabi proksi orqasida 1 qo'ying: rate limit haqiqiy IP bo'yicha ishlaydi.
     TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+    // Google Cloud'dagi OAuth Client ID (vergul bilan bir nechta). Bo'sh bo'lsa, Google orqali kirish o'chiq.
+    GOOGLE_CLIENT_ID: z.string().default(''),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV === 'production' && (env.JWT_SECRET.length < 32 || env.JWT_SECRET === EXAMPLE_SECRET)) {
