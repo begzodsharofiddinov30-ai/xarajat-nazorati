@@ -141,7 +141,12 @@ export function InstallButton({ variant = 'primary', className = '' }) {
 
   return (
     <>
-      {variant === 'icon' ? (
+      {variant === 'menu' ? (
+        <button role="menuitem" className={className} onClick={onClick}>
+          <DownloadIcon className="h-4.5 w-4.5 text-brand-600 dark:text-brand-400" />
+          Ilovani o'rnatish
+        </button>
+      ) : variant === 'icon' ? (
         <button className={`btn-icon text-brand-600 dark:text-brand-400 ${className}`} onClick={onClick} aria-label="Ilovani o'rnatish" title="Ilovani o'rnatish">
           <DownloadIcon />
         </button>

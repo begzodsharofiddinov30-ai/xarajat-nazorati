@@ -1,23 +1,9 @@
-import { NavLink, Outlet } from 'react-router';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useTheme } from '../context/ThemeContext.jsx';
-import { InstallButton } from './InstallButton.jsx';
-import {
-  FlagIcon,
-  HomeIcon,
-  ListIcon,
-  LogoutIcon,
-  MonitorIcon,
-  MoonIcon,
-  RepeatIcon,
-  SettingsIcon,
-  SunIcon,
-  PhoneIcon,
-  TargetIcon,
-} from './icons.jsx';
+import { Link, NavLink, Outlet } from 'react-router';
+import { FlagIcon, HomeIcon, ListIcon, PhoneIcon, RepeatIcon, TargetIcon } from './icons.jsx';
+import { UserMenu } from './UserMenu.jsx';
 
-// short — mobil pastki menyu uchun qisqa nom (5 ta tugma sig'ishi uchun).
-// bottom: false — pastki menyuga sig'maydi; telefonda Bosh sahifa va Sozlamalardan ochiladi.
+// label — kompyuterdagi yuqori menyu; short — telefon/planshetdagi pastki menyu (5 ta tugma sig'ishi uchun).
+// bottom: false — pastki menyuga sig'maydi; telefonda profil menyusi va Bosh sahifadan ochiladi.
 const NAV = [
   { to: '/', label: 'Bosh sahifa', short: 'Asosiy', Icon: HomeIcon, end: true },
   { to: '/transactions', label: 'Tranzaksiyalar', short: 'Yozuvlar', Icon: ListIcon },
@@ -27,36 +13,32 @@ const NAV = [
   { to: '/mobile', label: 'Mobil aloqa', short: 'Mobil', Icon: PhoneIcon, bottom: false },
 ];
 
-const THEMES = {
-  system: { Icon: MonitorIcon, label: 'Mavzu: tizim' },
-  light: { Icon: SunIcon, label: "Mavzu: yorug'" },
-  dark: { Icon: MoonIcon, label: "Mavzu: qorong'i" },
-};
-
 export function Layout() {
-  const { user, logout } = useAuth();
-  const { theme, cycle } = useTheme();
-  const T = THEMES[theme];
-
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-30 border-b pt-[env(safe-area-inset-top)] border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-        <div className="mx-auto flex h-14 max-w-5xl items-center gap-4 px-4">
-          <NavLink to="/" className="flex items-center gap-2 font-bold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">X</span>
-            <span className="hidden sm:inline">Xarajat Nazorati</span>
-          </NavLink>
+      <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-950/80">
+        <div className="mx-auto flex h-16 max-w-5xl items-center gap-4 px-4">
+          <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Xarajat Nazorati: bosh sahifa">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-brand-500 to-brand-700 text-base font-black text-white shadow-md shadow-brand-900/30">
+              X
+            </span>
+            <span className="leading-none">
+              <span className="block text-[15px] font-bold tracking-tight">Xarajat</span>
+              <span className="mt-0.5 block text-[11px] font-medium text-slate-500 dark:text-slate-400">Nazorati</span>
+            </span>
+          </Link>
 
-          <nav className="ml-4 hidden gap-1 md:flex">
+          {/* Yuqori menyu faqat keng ekranda: planshet va telefonda pastki menyu ishlatiladi. */}
+          <nav className="mx-auto hidden items-center gap-0.5 rounded-2xl border border-slate-200/70 bg-slate-100/70 p-1 lg:flex dark:border-slate-800 dark:bg-slate-900/70">
             {NAV.map(({ to, label, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
                 className={({ isActive }) =>
-                  `rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  `rounded-xl px-3 py-1.5 text-sm font-medium whitespace-nowrap transition ${
                     isActive
-                      ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
+                      ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
                       : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                   }`
                 }
@@ -66,48 +48,37 @@ export function Layout() {
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1">
-            <span className="mr-2 hidden max-w-40 truncate text-sm text-slate-500 sm:inline dark:text-slate-400">
-              {user?.name}
-            </span>
-            <InstallButton variant="icon" />
-            <button className="btn-icon" onClick={cycle} aria-label={T.label} title={T.label}>
-              <T.Icon />
-            </button>
-            <NavLink
-              to="/settings"
-              className={({ isActive }) => `btn-icon ${isActive ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white' : ''}`}
-              aria-label="Sozlamalar"
-              title="Sozlamalar"
-            >
-              <SettingsIcon />
-            </NavLink>
-            <button className="btn-icon" onClick={logout} aria-label="Chiqish" title="Chiqish">
-              <LogoutIcon />
-            </button>
+          <div className="ml-auto lg:ml-0">
+            <UserMenu />
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-44 md:pb-10">
+      <main className="mx-auto max-w-5xl px-4 pt-5 pb-44 md:pb-28 lg:pb-10">
         <Outlet />
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-950/95">
-        <div className="grid grid-cols-5">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200/70 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden dark:border-slate-800/70 dark:bg-slate-950/90">
+        <div className="mx-auto grid max-w-xl grid-cols-5">
           {NAV.filter((n) => n.bottom !== false).map(({ to, short, Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium ${
+                `flex flex-col items-center gap-1 pt-2 pb-1.5 text-[11px] font-medium transition ${
                   isActive ? 'text-brand-600 dark:text-brand-400' : 'text-slate-500 dark:text-slate-400'
                 }`
               }
             >
-              <Icon className="h-5 w-5" />
-              <span className="max-w-full truncate px-0.5">{short}</span>
+              {({ isActive }) => (
+                <>
+                  <span className={`flex h-7 w-12 items-center justify-center rounded-full transition ${isActive ? 'bg-brand-500/15' : ''}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="max-w-full truncate px-0.5">{short}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </div>
