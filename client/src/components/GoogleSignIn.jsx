@@ -95,8 +95,9 @@ export function GoogleSignIn({ dividerText = 'yoki email bilan' }) {
         cancel_on_tap_outside: false,
         context: 'signin',
         itp_support: true,
+        // One Tap Chrome'da FedCM orqali (Google talabi). Tugma esa klassik popup: eski Chrome va
+        // cookie'lari bloklangan brauzerlarda ham ishonchli ishlaydi.
         use_fedcm_for_prompt: true,
-        use_fedcm_for_button: true,
       });
       const dark = document.documentElement.classList.contains('dark');
       google.accounts.id.renderButton(ref.current, {
