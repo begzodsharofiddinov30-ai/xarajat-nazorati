@@ -19,6 +19,11 @@ const Key = ({ children }) => (
   <b className="rounded-md bg-slate-100 px-1.5 py-0.5 font-semibold dark:bg-slate-800">{children}</b>
 );
 
+// Android APK: GitHub Actions yig'adi (.github/workflows/android.yml), havola doim oxirgi versiyaga olib boradi.
+export const APK_URL =
+  'https://github.com/begzodsharofiddinov30-ai/xarajat-nazorati/releases/latest/download/xarajat-nazorati.apk';
+const isAndroid = () => /Android/i.test(navigator.userAgent);
+
 // Telefon tili o'zbekcha, ruscha yoki inglizcha bo'lishi mumkin, shuning uchun menyu nomlari uch tilda.
 const HOME = (
   <>
@@ -132,6 +137,7 @@ export function InstallButton({ variant = 'primary', className = '' }) {
   }
 
   const guide = GUIDES[browserKind()];
+  const android = isAndroid();
 
   return (
     <>
@@ -152,6 +158,18 @@ export function InstallButton({ variant = 'primary', className = '' }) {
       {open && (
         <Modal title="Ilovani o'rnatish" onClose={() => setOpen(false)}>
           <div className="space-y-4 text-sm">
+            {android && (
+              <div className="rounded-2xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-900/60 dark:bg-brand-950/40">
+                <a className="btn-primary w-full" href={APK_URL} rel="noopener">
+                  <DownloadIcon className="h-4 w-4" /> Android ilovani yuklab olish (APK)
+                </a>
+                <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                  Yuklangan <b>xarajat-nazorati.apk</b> faylini oching. Telefon so'rasa, shu brauzerga{' '}
+                  <b>«Noma'lum manbalardan o'rnatish»</b> («Неизвестные источники») ga ruxsat bering va <b>O'rnatish</b> ni bosing.
+                </p>
+              </div>
+            )}
+            {android && <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Yoki brauzer orqali</p>}
             {guide.note && <p className="text-slate-600 dark:text-slate-300">{guide.note}</p>}
             <ol className="space-y-3">
               {guide.steps.map((step, i) => (

@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "uz.xarajatnazorati.app",
+      "sha256_cert_fingerprints": ["74:72:3A:D1:ED:18:A0:23:AF:BE:25:5C:B7:B6:75:75:DA:15:92:B5:38:AF:D9:4D:9F:0D:3A:2E:16:FA:BC:9C"]
+    }
+  }
+]

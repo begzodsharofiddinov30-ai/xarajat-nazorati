@@ -1,0 +1,67 @@
+# Android APK (TWA) ni yig'adi va GitHub Release sifatida chiqaradi.
+# Yuklab olish havolasi doim oxirgi versiyaga olib boradi:
+#   https://github.com/begzodsharofiddinov30-ai/xarajat-nazorati/releases/latest/download/xarajat-nazorati.apk
+# Faqat android/ papkasi o'zgarganda ishga tushadi: sayt yangilanishlari ilovaga o'zi yetib boradi.
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: APK yig'ish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Saytdagi /.well-known/assetlinks.json dagi kalit bilan bir xil bo'lishi shart (aks holda manzil satri ko'rinadi).
+      EXPECTED_CERT_SHA256: 74723ad1ed18a023afbe255cb7b67575da1592b538afd94d9f0d3a2e16fabc9c
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Imzo kalitini tiklash
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.p12"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: APK yig'ish
+        working-directory: android
+        run: gradle assembleRelease --no-daemon --stacktrace
+        env:
+          KEYSTORE_PATH: ${{ runner.temp }}/release.p12
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+
+      - name: Imzoni tekshirish
+        run: |
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/apksigner" verify --print-certs "$APK" | tee certs.txt
+          grep -q "SHA-256 digest: $EXPECTED_CERT_SHA256" certs.txt
+          cp "$APK" xarajat-nazorati.apk
+          rm -f "$RUNNER_TEMP/release.p12"
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "android-v${{ github.run_number }}" xarajat-nazorati.apk \
+            --title "Android ilova 1.0.${{ github.run_number }}" \
+            --notes "Xarajat Nazorati Android ilovasi. Telefonda xarajat-nazorati.apk faylini yuklab oling va o'rnating (\"Noma'lum manbalardan o'rnatish\" ga ruxsat bering)." \
+            --latest

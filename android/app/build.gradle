@@ -1,0 +1,61 @@
+// Android ilova: Trusted Web Activity (TWA). Ilova telefondagi Chrome orqali saytni to'liq ekranda,
+// manzil satrisiz ochadi. Sayt yangilansa ilova ham o'zi yangilanadi, APK ni qayta o'rnatish shart emas.
+// APK GitHub Actions'da yig'iladi (.github/workflows/android.yml).
+plugins {
+    id 'com.android.application'
+}
+
+def siteHost = 'xarajat-nazorati.vercel.app'
+def siteUrl = "https://${siteHost}/"
+
+android {
+    namespace 'uz.xarajatnazorati.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'uz.xarajatnazorati.app'
+        minSdk 21
+        targetSdk 35
+        // CI har yig'ishda raqamni oshiradi: Android yangi APK ni eskisining ustiga o'rnatishi uchun kerak.
+        versionCode((System.getenv('VERSION_CODE') ?: '1') as int)
+        versionName "1.0.${System.getenv('VERSION_CODE') ?: '0'}"
+
+        manifestPlaceholders = [hostName: siteHost, defaultUrl: siteUrl]
+        resValue 'string', 'assetStatements',
+            "[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://${siteHost}\"}}]"
+    }
+
+    // Imzo kaliti GitHub secret'idan keladi. Kalit yo'qolsa, telefondagi ilovani yangilab bo'lmaydi.
+    signingConfigs {
+        release {
+            def ks = System.getenv('KEYSTORE_PATH')
+            if (ks) {
+                storeFile file(ks)
+                storeType 'pkcs12'
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias 'xarajat'
+                keyPassword System.getenv('KEYSTORE_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures {
+        resValues true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
