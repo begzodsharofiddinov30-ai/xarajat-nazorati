@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import { phonesApi } from '../api/phones.js';
 import { transactionsApi } from '../api/transactions.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { CATEGORY_ICONS, CATEGORY_LABELS, categoriesFor } from '../utils/categories.js';
 import { todayStr } from '../utils/month.js';
+import { formatPhone } from '../utils/phone.js';
 import { AmountInput } from './AmountInput.jsx';
 import { TrashIcon } from './icons.jsx';
 import { Modal } from './Modal.jsx';
@@ -21,9 +23,20 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
     category: initial?.category ?? 'food',
     date: initial?.date ?? todayStr(),
     note: initial?.note ?? '',
+    phone: initial?.phone ?? null,
   }));
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
+  // "Mobil aloqa" tanlanganda foydalanuvchining telefon raqamlari bir marta yuklanadi.
+  const [phones, setPhones] = useState(null);
+
+  useEffect(() => {
+    if (form.category !== 'mobile' || phones) return;
+    phonesApi.list().then(
+      (r) => setPhones(r.data),
+      () => setPhones([]),
+    );
+  }, [form.category, phones]);
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
   const setType = (type) =>
@@ -40,9 +53,8 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
     setBusy(true);
     setErrors({});
     try {
-      const res = editing
-        ? await transactionsApi.update(initial.id, form)
-        : await transactionsApi.create(form);
+      const body = { ...form, phone: form.category === 'mobile' ? form.phone : null };
+      const res = editing ? await transactionsApi.update(initial.id, body) : await transactionsApi.create(body);
       if (res.warning) toast(res.warning.message, 'warning');
       else toast(editing ? 'Tranzaksiya yangilandi' : "Tranzaksiya qo'shildi");
       onSaved?.(res.data);
@@ -124,6 +136,38 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
             + O'z kategoriyangizni qo'shing
           </Link>
         </fieldset>
+
+        {form.category === 'mobile' && (
+          <fieldset>
+            <legend className="label">Qaysi raqamga</legend>
+            {phones === null ? (
+              <div className="h-9 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {[{ id: null, label: "Ko'rsatilmagan" }, ...phones].map((p) => (
+                  <button
+                    key={p.id ?? 'none'}
+                    type="button"
+                    onClick={() => set({ phone: p.id })}
+                    aria-pressed={form.phone === p.id}
+                    title={p.number ? formatPhone(p.number) : undefined}
+                    className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
+                      form.phone === p.id
+                        ? 'border-brand-500 bg-brand-50 text-brand-800 dark:bg-brand-500/10 dark:text-brand-300'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+                <Link to="/mobile" onClick={onClose} className="self-center text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                  + Raqam qo'shish
+                </Link>
+              </div>
+            )}
+            <FieldError>{errors.phone}</FieldError>
+          </fieldset>
+        )}
 
         <div>
           <label className="label" htmlFor="tx-date">

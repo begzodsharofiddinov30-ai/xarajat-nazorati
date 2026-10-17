@@ -271,6 +271,17 @@ export default function Settings() {
         <ChevronRightIcon className="h-5 w-5 text-slate-400" />
       </Link>
 
+      <Link to="/mobile" className="card flex items-center gap-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
+        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-xl dark:bg-slate-800" aria-hidden="true">
+          📱
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">Mobil aloqa</span>
+          <span className="block text-sm text-slate-500 dark:text-slate-400">Telefon raqamlaringiz va balans to'lovlari</span>
+        </span>
+        <ChevronRightIcon className="h-5 w-5 text-slate-400" />
+      </Link>
+
       <ProfileCard />
       <PasswordCard />
       <SessionsCard />

@@ -12,16 +12,19 @@ import {
   RepeatIcon,
   SettingsIcon,
   SunIcon,
+  PhoneIcon,
   TargetIcon,
 } from './icons.jsx';
 
 // short — mobil pastki menyu uchun qisqa nom (5 ta tugma sig'ishi uchun).
+// bottom: false — pastki menyuga sig'maydi; telefonda Bosh sahifa va Sozlamalardan ochiladi.
 const NAV = [
   { to: '/', label: 'Bosh sahifa', short: 'Asosiy', Icon: HomeIcon, end: true },
   { to: '/transactions', label: 'Tranzaksiyalar', short: 'Yozuvlar', Icon: ListIcon },
   { to: '/recurring', label: 'Takroriy', short: 'Takroriy', Icon: RepeatIcon },
   { to: '/budgets', label: 'Budjetlar', short: 'Budjet', Icon: TargetIcon },
   { to: '/goals', label: 'Maqsadlar', short: 'Maqsad', Icon: FlagIcon },
+  { to: '/mobile', label: 'Mobil aloqa', short: 'Mobil', Icon: PhoneIcon, bottom: false },
 ];
 
 const THEMES = {
@@ -92,7 +95,7 @@ export function Layout() {
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-950/95">
         <div className="grid grid-cols-5">
-          {NAV.map(({ to, short, Icon, end }) => (
+          {NAV.filter((n) => n.bottom !== false).map(({ to, short, Icon, end }) => (
             <NavLink
               key={to}
               to={to}

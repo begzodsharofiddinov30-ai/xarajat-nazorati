@@ -25,6 +25,8 @@ export function RecurringForm({ initial, onClose, onSaved }) {
     startDate: initial?.startDate ?? todayStr(),
     endDate: initial?.endDate ?? '',
     active: initial?.active ?? true,
+    // Mobil aloqa qoidasi bog'langan raqam: tahrirlashda yo'qolmasligi kerak.
+    phone: initial?.phone ?? null,
   }));
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
@@ -43,7 +45,7 @@ export function RecurringForm({ initial, onClose, onSaved }) {
 
     setBusy(true);
     setErrors({});
-    const body = { ...form, endDate: form.endDate || null };
+    const body = { ...form, endDate: form.endDate || null, phone: form.category === 'mobile' ? form.phone : null };
     try {
       if (editing) await recurringApi.update(initial.id, body);
       else await recurringApi.create(body);

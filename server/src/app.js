@@ -14,6 +14,7 @@ import authRoutes from './routes/auth.routes.js';
 import budgetRoutes from './routes/budget.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import goalRoutes from './routes/goal.routes.js';
+import phoneRoutes from './routes/phone.routes.js';
 import recurringRoutes from './routes/recurring.routes.js';
 import summaryRoutes from './routes/summary.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
@@ -72,6 +73,7 @@ export function createApp() {
   app.use('/api/categories', requireAuth, categoryRoutes);
   app.use('/api/recurring', requireAuth, recurringRoutes);
   app.use('/api/goals', requireAuth, goalRoutes);
+  app.use('/api/phones', requireAuth, catchUpRecurring, phoneRoutes);
 
   // Production'da frontend build'ini shu serverning o'zi tarqatadi: bitta xizmat, bitta domen, CORS kerak emas.
   if (env.NODE_ENV === 'production' && fs.existsSync(CLIENT_DIST)) {

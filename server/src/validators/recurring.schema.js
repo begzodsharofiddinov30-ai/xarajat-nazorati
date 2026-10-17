@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { FREQUENCIES } from '../utils/recurrence.js';
-import { amountField, categoryKeyField, dateField, noteField, typeField } from './common.js';
+import { amountField, categoryKeyField, dateField, noteField, phoneRefField, typeField } from './common.js';
 
 export const recurringBodySchema = z
   .object({
@@ -12,6 +12,7 @@ export const recurringBodySchema = z
     startDate: dateField("Boshlanish sanasi YYYY-MM-DD formatida bo'lishi kerak"),
     endDate: dateField("Tugash sanasi YYYY-MM-DD formatida bo'lishi kerak").nullable().optional(),
     active: z.boolean().optional().default(true),
+    phone: phoneRefField,
   })
   .superRefine((v, ctx) => {
     if (v.endDate && v.endDate < v.startDate) {

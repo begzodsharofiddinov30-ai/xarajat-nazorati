@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { formatSom } from '../utils/format.js';
 import { budgetsApi } from '../api/budgets.js';
 import { summaryApi } from '../api/summary.js';
 import { transactionsApi } from '../api/transactions.js';
@@ -123,6 +124,20 @@ export default function Dashboard() {
           <InsightCards month={month} summary={s} previous={previous.data} />
 
           <ForecastCard summary={s} previous={previous.data} budgets={budgets.data ?? []} />
+
+          <Link to="/mobile" className="card flex items-center gap-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-xl dark:bg-slate-800" aria-hidden="true">
+              📱
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Mobil aloqa</span>
+              <span className="block text-sm text-slate-500 dark:text-slate-400">Telefon balansi to'lovlari raqamlar bo'yicha</span>
+            </span>
+            <span className="shrink-0 text-right">
+              <span className="block font-semibold tabular-nums">{formatSom(s?.byCategory.find((c) => c.category === 'mobile')?.total ?? 0)}</span>
+              <span className="block text-xs text-slate-500 dark:text-slate-400">shu oy</span>
+            </span>
+          </Link>
 
           <div className="grid gap-4 md:grid-cols-2">
             <Section title="Kategoriyalar" subtitle="Bu oydagi xarajatlar taqsimoti">

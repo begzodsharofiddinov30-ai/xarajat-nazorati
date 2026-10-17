@@ -17,6 +17,8 @@ const transactionSchema = new mongoose.Schema(
     note: { type: String, trim: true, maxlength: 200, default: '' },
     // Takroriy qoidadan avtomatik yaratilgan bo'lsa, qoida _id si.
     recurring: { type: mongoose.Schema.Types.ObjectId, ref: 'Recurring' },
+    // Mobil aloqa to'lovi qaysi telefon raqamiga (Phone) qilingani.
+    phone: { type: mongoose.Schema.Types.ObjectId, ref: 'Phone' },
   },
   { timestamps: true },
 );
@@ -34,6 +36,7 @@ transactionSchema.set('toJSON', {
     ret.id = String(ret._id);
     delete ret._id;
     delete ret.user;
+    if (ret.phone) ret.phone = String(ret.phone);
     if (ret.recurring) ret.recurring = String(ret.recurring);
     ret.date = ret.date.toISOString().slice(0, 10);
     return ret;

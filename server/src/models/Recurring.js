@@ -22,6 +22,8 @@ const recurringSchema = new mongoose.Schema(
     // Nechta uchrashuv allaqachon yaratilgan (keyingisi shu raqamli).
     nextIndex: { type: Number, default: 0, min: 0 },
     active: { type: Boolean, default: true },
+    // Mobil aloqa to'lovi qaysi telefon raqamiga (Phone) qilingani.
+    phone: { type: mongoose.Schema.Types.ObjectId, ref: 'Phone' },
   },
   { timestamps: true },
 );
@@ -34,6 +36,7 @@ recurringSchema.set('toJSON', {
     ret.id = String(ret._id);
     delete ret._id;
     delete ret.user;
+    if (ret.phone) ret.phone = String(ret.phone);
     ret.startDate = ret.startDate.toISOString().slice(0, 10);
     ret.endDate = ret.endDate ? ret.endDate.toISOString().slice(0, 10) : null;
     return ret;

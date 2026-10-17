@@ -31,6 +31,7 @@ export async function materializeRecurring(userId, todayStr = todayUtcStr()) {
       note: rule.note,
       date,
       recurring: rule._id,
+      ...(rule.phone && { phone: rule.phone }),
     }));
 
     try {

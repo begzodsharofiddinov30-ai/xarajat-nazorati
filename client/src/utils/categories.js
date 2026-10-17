@@ -10,6 +10,7 @@ const BASE_EXPENSE = [
   'education',
   'entertainment',
   'clothing',
+  'mobile',
   'other',
 ];
 const BASE_INCOME = ['salary', 'freelance', 'gift', 'other_income'];
@@ -27,6 +28,7 @@ const BASE_LABELS = {
   education: "Ta'lim",
   entertainment: "Ko'ngilochar",
   clothing: 'Kiyim',
+  mobile: 'Mobil aloqa',
   other: 'Boshqa',
   salary: 'Maosh',
   freelance: 'Frilans',
@@ -43,6 +45,7 @@ const BASE_ICONS = {
   education: '📚',
   entertainment: '🎬',
   clothing: '👕',
+  mobile: '📱',
   other: '📦',
   salary: '💼',
   freelance: '💻',

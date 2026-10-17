@@ -160,6 +160,8 @@ Barcha himoyalangan endpoint'lar `Authorization: Bearer <token>` sarlavhasini ta
 | GET, POST | `/api/goals` | Maqsad: `{ name, targetAmount, deadline? }` → `saved`, `percent`, `remaining`, `monthlyNeeded` |
 | PUT, DELETE | `/api/goals/:id` | |
 | POST | `/api/goals/:id/contributions` | `{ amount, date?, note? }`: musbat — qo'shish, manfiy — qaytarib olish |
+| GET | `/api/phones?month=YYYY-MM` | Mobil aloqa: raqamlar + shu oy to'langan (`paid`), `lastPayment`, `autoPay`; `meta`: `total`, `unassigned`, 6 oylik `trend` |
+| POST, PUT, DELETE | `/api/phones[/:id]` | Raqam: `{ label, number, operator? }`. Operator raqamdan aniqlanadi; o'chirilsa to'lovlar qoladi |
 | DELETE | `/api/goals/:id/contributions/:cid` | |
 
 **Xatolar** doim bir xil formatda qaytadi:

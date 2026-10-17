@@ -8,6 +8,7 @@ import { FullScreenSpinner, GuestRoute, ProtectedRoute } from './components/Rout
 const Budgets = lazy(() => import('./pages/Budgets.jsx'));
 const Categories = lazy(() => import('./pages/Categories.jsx'));
 const Goals = lazy(() => import('./pages/Goals.jsx'));
+const Mobile = lazy(() => import('./pages/Mobile.jsx'));
 const Recurring = lazy(() => import('./pages/Recurring.jsx'));
 const Settings = lazy(() => import('./pages/Settings.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
@@ -32,6 +33,7 @@ export default function App() {
               <Route path="budgets" element={<Budgets />} />
               <Route path="recurring" element={<Recurring />} />
               <Route path="goals" element={<Goals />} />
+              <Route path="mobile" element={<Mobile />} />
               <Route path="categories" element={<Categories />} />
               <Route path="settings" element={<Settings />} />
             </Route>
