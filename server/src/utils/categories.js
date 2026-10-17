@@ -36,3 +36,8 @@ export function isValidCategory(type, category) {
   const list = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
   return list.includes(category);
 }
+
+// Foydalanuvchi o'zi qo'shgan kategoriyalar kaliti: "c_" + Category _id (24 ta hex belgi).
+export const CUSTOM_KEY_RE = /^c_[0-9a-f]{24}$/;
+export const isCustomKey = (key) => CUSTOM_KEY_RE.test(key);
+export const isBuiltinCategory = (key) => ALL_CATEGORIES.includes(key);

@@ -34,6 +34,7 @@
 :root {
   --series-1: #e34948;
   --series-1-muted: #f5b5b4;
+  --series-income: #0e9f6e;
   --chart-grid: #e4e4e7;
   --chart-text: #71717a;
   --status-good: #0ca30c;
@@ -44,6 +45,7 @@
 .dark {
   --series-1: #e66767;
   --series-1-muted: #9b3a3a;
+  --series-income: #34d399;
   --chart-grid: #27272a;
   --chart-text: #a1a1aa;
   color-scheme: dark;

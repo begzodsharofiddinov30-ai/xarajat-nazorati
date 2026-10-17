@@ -10,7 +10,7 @@ export const BUDGET_STATUS = {
 };
 
 export function BudgetProgress({ budget, compact = false, actions }) {
-  const { category, limit, spent, remaining, percent, status } = budget;
+  const { category, limit, spent, remaining, percent, status, projected, projectedExceeds } = budget;
   const s = BUDGET_STATUS[status];
 
   return (
@@ -45,6 +45,12 @@ export function BudgetProgress({ budget, compact = false, actions }) {
           {remaining < 0 ? `${formatSom(-remaining)} ortiqcha` : `${formatSom(remaining)} qoldi`}
         </span>
       </div>
+      {projectedExceeds && (
+        <p className="mt-1 flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400">
+          <AlertIcon className="h-3.5 w-3.5 shrink-0" />
+          Shu tempda oy oxirida ~{formatSom(projected)} bo'ladi, limitdan oshishi mumkin
+        </p>
+      )}
     </div>
   );
 }

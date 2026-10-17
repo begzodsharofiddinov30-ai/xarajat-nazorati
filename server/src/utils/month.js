@@ -34,3 +34,19 @@ export function isValidDateString(str) {
 export function parseDateOnly(str) {
   return new Date(`${str}T00:00:00.000Z`);
 }
+
+export function todayUtcStr(d = new Date()) {
+  return d.toISOString().slice(0, 10);
+}
+
+// 'YYYY-MM-DD' ga kun qo'shadi (UTC).
+export function addDays(dateStr, days) {
+  const d = parseDateOnly(dateStr);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export function shiftMonth(month, delta) {
+  const [y, m] = month.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1 + delta, 1)).toISOString().slice(0, 7);
+}

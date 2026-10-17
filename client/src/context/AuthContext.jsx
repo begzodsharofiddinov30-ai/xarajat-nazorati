@@ -39,6 +39,13 @@ export function AuthProvider({ children }) {
     setStatus('authed');
   }, []);
 
+  // Profil yangilanganda (ism) yoki token almashganda (parol o'zgarishi) sessiyani shu yerda saqlaymiz.
+  const updateUser = useCallback((u) => setUser(u), []);
+  const replaceSession = useCallback(({ token, user: u }) => {
+    setToken(token);
+    setUser(u);
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -47,8 +54,10 @@ export function AuthProvider({ children }) {
       register: async (body) => finish(await authApi.register(body)),
       logout,
       retry: checkSession,
+      updateUser,
+      replaceSession,
     }),
-    [user, status, finish, logout, checkSession],
+    [user, status, finish, logout, checkSession, updateUser, replaceSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

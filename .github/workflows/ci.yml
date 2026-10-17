@@ -1,0 +1,54 @@
+# Har bir push va pull request'da: server testlari va client build'i.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server:
+    name: Server testlari
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      # mongodb-memory-server MongoDB binarini (~100 MB) bir marta yuklaydi, keyin keshdan oladi.
+      - uses: actions/cache@v4
+        with:
+          path: server/node_modules/.cache/mongodb-memory-server
+          key: mongodb-binary-${{ runner.os }}-${{ hashFiles('server/package-lock.json') }}
+      - run: npm ci
+      - run: npm test
+
+  client:
+    name: Client build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run build

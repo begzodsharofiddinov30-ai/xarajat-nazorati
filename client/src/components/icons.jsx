@@ -135,3 +135,36 @@ export const TrendIcon = (p) => (
     <path d="M16 7h6v6" />
   </Icon>
 );
+export const RepeatIcon = (p) => (
+  <Icon {...p}>
+    <path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3" />
+  </Icon>
+);
+export const FlagIcon = (p) => (
+  <Icon {...p}>
+    <path d="M5 21V4M5 4h11l-2 4 2 4H5" />
+  </Icon>
+);
+export const SettingsIcon = (p) => (
+  <Icon {...p}>
+    <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0" />
+    <circle cx="16" cy="6" r="2" />
+    <circle cx="8" cy="12" r="2" />
+    <circle cx="18" cy="18" r="2" />
+  </Icon>
+);
+export const UploadIcon = (p) => (
+  <Icon {...p}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+  </Icon>
+);
+export const TagIcon = (p) => (
+  <Icon {...p}>
+    <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8zM7.5 7.5h.01" />
+  </Icon>
+);
+export const FilterIcon = (p) => (
+  <Icon {...p}>
+    <path d="M3 5h18l-7 8v6l-4 2v-8z" />
+  </Icon>
+);

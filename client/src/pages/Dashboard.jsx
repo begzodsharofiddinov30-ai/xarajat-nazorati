@@ -6,7 +6,9 @@ import { transactionsApi } from '../api/transactions.js';
 import { BudgetProgress } from '../components/BudgetProgress.jsx';
 import { CategoryBreakdown } from '../components/charts/CategoryBreakdown.jsx';
 import { DailyChart } from '../components/charts/DailyChart.jsx';
+import { TrendChart } from '../components/charts/TrendChart.jsx';
 import { BalanceHero } from '../components/dashboard/BalanceHero.jsx';
+import { ForecastCard } from '../components/dashboard/ForecastCard.jsx';
 import { InsightCards } from '../components/dashboard/InsightCards.jsx';
 import { WelcomeCard } from '../components/dashboard/WelcomeCard.jsx';
 import { Fab } from '../components/Fab.jsx';
@@ -61,6 +63,7 @@ export default function Dashboard() {
 
   const summary = useAsync(() => summaryApi.get(month), [month]);
   const previous = useAsync(() => summaryApi.get(shiftMonth(month, -1)), [month]);
+  const trend = useAsync(() => summaryApi.trend(month, 6), [month]);
   const budgets = useAsync(() => budgetsApi.list(month), [month]);
   const recent = useAsync(() => transactionsApi.list({ month, limit: 5 }), [month]);
 
@@ -68,6 +71,7 @@ export default function Dashboard() {
     summary.reload();
     budgets.reload();
     recent.reload();
+    trend.reload();
   };
 
   const s = summary.data;
@@ -118,6 +122,8 @@ export default function Dashboard() {
         <>
           <InsightCards month={month} summary={s} previous={previous.data} />
 
+          <ForecastCard summary={s} previous={previous.data} budgets={budgets.data ?? []} />
+
           <div className="grid gap-4 md:grid-cols-2">
             <Section title="Kategoriyalar" subtitle="Bu oydagi xarajatlar taqsimoti">
               {s ? <CategoryBreakdown data={s.byCategory} total={s.expense} /> : <div className="h-48" />}
@@ -127,6 +133,10 @@ export default function Dashboard() {
               {s ? <DailyChart data={s.daily} /> : <div className="h-56" />}
             </Section>
           </div>
+
+          <Section title="Oxirgi 6 oy" subtitle="Daromad va xarajat dinamikasi">
+            {trend.data ? <TrendChart data={trend.data} /> : <div className="h-56" />}
+          </Section>
 
           <Section title="So'nggi tranzaksiyalar" link={{ to: '/transactions', label: 'Barchasi' }}>
             <ul className="-my-3 divide-y divide-slate-100 dark:divide-slate-800">

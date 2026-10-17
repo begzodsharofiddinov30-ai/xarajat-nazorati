@@ -1,38 +1,46 @@
 import { z } from 'zod';
-import { ALL_CATEGORIES, TYPES, isValidCategory } from '../utils/categories.js';
-import { MONTH_RE, isValidDateString } from '../utils/month.js';
+import { amountField, categoryKeyField, dateField, monthField, noteField, typeField } from './common.js';
 
-export const monthField = z.string().regex(MONTH_RE, "Oy YYYY-MM formatida bo'lishi kerak");
+export { monthField };
 
-export const transactionBodySchema = z
+export const transactionBodySchema = z.object({
+  type: typeField,
+  amount: amountField,
+  category: categoryKeyField,
+  date: dateField(),
+  note: noteField(),
+});
+
+const SORTS = ['date_desc', 'date_asc', 'amount_desc', 'amount_asc'];
+
+export const transactionListQuerySchema = z
   .object({
-    type: z.enum(TYPES, { errorMap: () => ({ message: "Tur 'income' yoki 'expense' bo'lishi kerak" }) }),
-    amount: z
-      .number({ required_error: 'Summani kiriting', invalid_type_error: "Summa son bo'lishi kerak" })
-      .int("Summa butun son bo'lishi kerak (tiyinsiz)")
-      .positive("Summa musbat bo'lishi kerak")
-      .max(1_000_000_000_000, 'Summa juda katta'),
-    category: z.string({ required_error: 'Kategoriyani tanlang' }),
-    date: z
-      .string({ required_error: 'Sanani kiriting' })
-      .refine(isValidDateString, "Sana YYYY-MM-DD formatida va to'g'ri bo'lishi kerak"),
-    note: z.string().trim().max(200, 'Izoh 200 belgidan oshmasin').optional().default(''),
+    month: monthField.optional(),
+    // from/to berilsa, month e'tiborga olinmaydi.
+    from: dateField().optional(),
+    to: dateField().optional(),
+    type: typeField.optional(),
+    category: categoryKeyField.optional(),
+    q: z.string().trim().max(100).optional(),
+    minAmount: z.coerce.number().int().min(0).optional(),
+    maxAmount: z.coerce.number().int().min(0).optional(),
+    sort: z.enum(SORTS).default('date_desc'),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(1000).default(500),
   })
-  .superRefine((val, ctx) => {
-    if (!isValidCategory(val.type, val.category)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['category'],
-        message: 'Kategoriya tranzaksiya turiga mos emas',
-      });
+  .superRefine((q, ctx) => {
+    if (q.from && q.to && q.from > q.to) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['to'], message: "Tugash sanasi boshlanishdan oldin bo'lmasin" });
+    }
+    if (q.minAmount != null && q.maxAmount != null && q.minAmount > q.maxAmount) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['maxAmount'], message: "Maksimal summa minimaldan kichik bo'lmasin" });
     }
   });
 
-export const transactionListQuerySchema = z.object({
-  month: monthField.optional(),
-  type: z.enum(TYPES).optional(),
-  category: z.enum(ALL_CATEGORIES).optional(),
-  q: z.string().trim().max(100).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(1000).default(500),
+export const MAX_IMPORT_ROWS = 1000;
+
+// Import: qatorlar alohida tekshiriladi (yaroqsizlari hisobotga tushadi), shuning uchun bu yerda faqat o'ram.
+export const transactionImportSchema = z.object({
+  rows: z.array(z.record(z.any())).min(1, "Import uchun qatorlar yo'q").max(MAX_IMPORT_ROWS, `Bir martada ${MAX_IMPORT_ROWS} tadan ko'p qator import qilib bo'lmaydi`),
+  skipDuplicates: z.boolean().default(true),
 });

@@ -5,7 +5,7 @@ const ToastContext = createContext(null);
 
 const STYLES = {
   success: { icon: CheckIcon, color: 'var(--status-good)', title: 'Tayyor' },
-  warning: { icon: AlertIcon, color: 'var(--status-warning)', title: 'Budjet oshdi' },
+  warning: { icon: AlertIcon, color: 'var(--status-warning)', title: 'Budjet ogohlantirishi' },
   error: { icon: AlertIcon, color: 'var(--status-critical)', title: 'Xatolik' },
 };
 
@@ -16,11 +16,12 @@ export function ToastProvider({ children }) {
   const dismiss = useCallback((id) => setToasts((list) => list.filter((t) => t.id !== id)), []);
 
   const show = useCallback(
-    (message, type = 'success') => {
+    // options.action = { label, onClick } — masalan "Qaytarish"; options.duration — millisekundlarda.
+    (message, type = 'success', options = {}) => {
       const id = nextId.current++;
       // Telefonda ustma-ust bildirishnomalar sahifani yopmasligi uchun faqat oxirgisi ko'rsatiladi.
-      setToasts([{ id, message, type }]);
-      setTimeout(() => dismiss(id), type === 'warning' ? 8000 : 4000);
+      setToasts([{ id, message, type, action: options.action }]);
+      setTimeout(() => dismiss(id), options.duration ?? (type === 'warning' ? 8000 : options.action ? 8000 : 4000));
     },
     [dismiss],
   );
@@ -46,6 +47,17 @@ export function ToastProvider({ children }) {
               <div className="min-w-0 flex-1 text-sm">
                 <p className="font-semibold">{s.title}</p>
                 <p className="text-slate-600 dark:text-slate-300">{t.message}</p>
+                {t.action && (
+                  <button
+                    className="mt-1 text-sm font-semibold text-brand-600 underline-offset-2 hover:underline dark:text-brand-400"
+                    onClick={() => {
+                      dismiss(t.id);
+                      t.action.onClick();
+                    }}
+                  >
+                    {t.action.label}
+                  </button>
+                )}
               </div>
               <button className="btn-icon -m-1 h-7 w-7" onClick={() => dismiss(t.id)} aria-label="Yopish">
                 <XIcon className="h-4 w-4" />

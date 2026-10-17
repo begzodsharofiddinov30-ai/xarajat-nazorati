@@ -1,20 +1,20 @@
 import { z } from 'zod';
-import { EXPENSE_CATEGORIES } from '../utils/categories.js';
-import { monthField } from './transaction.schema.js';
-
-const category = z.enum(EXPENSE_CATEGORIES, {
-  errorMap: () => ({ message: "Budjet faqat xarajat kategoriyasi uchun o'rnatiladi" }),
-});
+import { MAX_AMOUNT, expenseCategoryKeyField, monthField, todayField } from './common.js';
 
 export const budgetUpsertSchema = z.object({
-  category,
+  category: expenseCategoryKeyField,
   limit: z
     .number({ required_error: 'Limitni kiriting', invalid_type_error: "Limit son bo'lishi kerak" })
     .int("Limit butun son bo'lishi kerak")
     .positive("Limit musbat bo'lishi kerak")
-    .max(1_000_000_000_000, 'Limit juda katta'),
+    .max(MAX_AMOUNT, 'Limit juda katta'),
 });
 
-export const budgetCategoryParamSchema = z.object({ category });
+export const budgetCategoryParamSchema = z.object({ category: expenseCategoryKeyField });
 
-export const monthQuerySchema = z.object({ month: monthField.optional() });
+export const monthQuerySchema = z.object({ month: monthField.optional(), today: todayField });
+
+export const trendQuerySchema = z.object({
+  month: monthField.optional(),
+  months: z.coerce.number().int().min(2).max(12).default(6),
+});

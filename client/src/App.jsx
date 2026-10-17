@@ -6,6 +6,10 @@ import { FullScreenSpinner, GuestRoute, ProtectedRoute } from './components/Rout
 
 // Sahifalar alohida yuklanadi: login sahifasi og'ir grafik kutubxonasini (Recharts) kutmaydi.
 const Budgets = lazy(() => import('./pages/Budgets.jsx'));
+const Categories = lazy(() => import('./pages/Categories.jsx'));
+const Goals = lazy(() => import('./pages/Goals.jsx'));
+const Recurring = lazy(() => import('./pages/Recurring.jsx'));
+const Settings = lazy(() => import('./pages/Settings.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const Login = lazy(() => import('./pages/Login.jsx'));
 const Register = lazy(() => import('./pages/Register.jsx'));
@@ -26,6 +30,10 @@ export default function App() {
               <Route index element={<Dashboard />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="budgets" element={<Budgets />} />
+              <Route path="recurring" element={<Recurring />} />
+              <Route path="goals" element={<Goals />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -11,7 +11,7 @@ const schema = z
     JWT_SECRET: z.string().min(16, "JWT_SECRET kamida 16 belgidan iborat bo'lishi kerak"),
     JWT_EXPIRES_IN: z.string().default('7d'),
     CLIENT_URL: z.string().default('http://localhost:5173'),
-    // Render, Railway, Nginx kabi proksi orqasida 1 qo'ying: rate limit haqiqiy IP bo'yicha ishlaydi.
+    // Vercel, Nginx kabi proksi orqasida 1 qo'ying: rate limit haqiqiy IP bo'yicha ishlaydi.
     TRUST_PROXY: z.coerce.number().int().min(0).default(0),
   })
   .superRefine((env, ctx) => {

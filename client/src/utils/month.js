@@ -36,6 +36,12 @@ export function monthLabel(month) {
   return `${MONTHS[m - 1]} ${y}`;
 }
 
+// Grafik o'qi uchun qisqa nom: "Okt"
+export function shortMonthLabel(month) {
+  const m = Number(month.slice(5, 7));
+  return MONTHS[m - 1].slice(0, 3);
+}
+
 export function dateLabel(date) {
   const [y, m, d] = date.split('-').map(Number);
   const label = `${d}-${MONTHS[m - 1].toLowerCase()}`;

@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-import { EXPENSE_CATEGORIES } from '../utils/categories.js';
 
 // Limit har oy uchun takrorlanadi: har bir foydalanuvchi uchun bitta kategoriyaga bitta yozuv.
 const budgetSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    category: { type: String, enum: EXPENSE_CATEGORIES, required: true },
+    category: { type: String, required: true, maxlength: 40 },
     limit: {
       type: Number,
       required: true,

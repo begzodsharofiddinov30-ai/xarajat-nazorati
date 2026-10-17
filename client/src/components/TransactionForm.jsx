@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { transactionsApi } from '../api/transactions.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { CATEGORY_ICONS, CATEGORY_LABELS, categoriesFor } from '../utils/categories.js';
@@ -115,6 +116,13 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
             ))}
           </div>
           <FieldError>{errors.category}</FieldError>
+          <Link
+            to="/categories"
+            onClick={onClose}
+            className="mt-2 inline-block text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+          >
+            + O'z kategoriyangizni qo'shing
+          </Link>
         </fieldset>
 
         <div>

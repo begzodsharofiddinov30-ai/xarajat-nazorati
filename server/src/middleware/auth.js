@@ -18,6 +18,11 @@ export async function requireAuth(req, _res, next) {
   const user = await User.findById(payload.sub);
   if (!user) throw ApiError.unauthorized("Sessiya muddati tugagan yoki token noto'g'ri", 'INVALID_TOKEN');
 
+  // Parol almashtirilgan yoki "hamma qurilmadan chiqish" bosilgan bo'lsa, eski token yaroqsiz.
+  if ((payload.ver ?? 0) !== (user.tokenVersion ?? 0)) {
+    throw ApiError.unauthorized("Sessiya muddati tugagan yoki token noto'g'ri", 'INVALID_TOKEN');
+  }
+
   req.user = { id: user.id, name: user.name, email: user.email };
   next();
 }

@@ -1,12 +1,26 @@
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { HomeIcon, ListIcon, LogoutIcon, MonitorIcon, MoonIcon, SunIcon, TargetIcon } from './icons.jsx';
+import {
+  FlagIcon,
+  HomeIcon,
+  ListIcon,
+  LogoutIcon,
+  MonitorIcon,
+  MoonIcon,
+  RepeatIcon,
+  SettingsIcon,
+  SunIcon,
+  TargetIcon,
+} from './icons.jsx';
 
+// short — mobil pastki menyu uchun qisqa nom (5 ta tugma sig'ishi uchun).
 const NAV = [
-  { to: '/', label: 'Bosh sahifa', Icon: HomeIcon, end: true },
-  { to: '/transactions', label: 'Tranzaksiyalar', Icon: ListIcon },
-  { to: '/budgets', label: 'Budjetlar', Icon: TargetIcon },
+  { to: '/', label: 'Bosh sahifa', short: 'Asosiy', Icon: HomeIcon, end: true },
+  { to: '/transactions', label: 'Tranzaksiyalar', short: 'Yozuvlar', Icon: ListIcon },
+  { to: '/recurring', label: 'Takroriy', short: 'Takroriy', Icon: RepeatIcon },
+  { to: '/budgets', label: 'Budjetlar', short: 'Budjet', Icon: TargetIcon },
+  { to: '/goals', label: 'Maqsadlar', short: 'Maqsad', Icon: FlagIcon },
 ];
 
 const THEMES = {
@@ -55,6 +69,14 @@ export function Layout() {
             <button className="btn-icon" onClick={cycle} aria-label={T.label} title={T.label}>
               <T.Icon />
             </button>
+            <NavLink
+              to="/settings"
+              className={({ isActive }) => `btn-icon ${isActive ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white' : ''}`}
+              aria-label="Sozlamalar"
+              title="Sozlamalar"
+            >
+              <SettingsIcon />
+            </NavLink>
             <button className="btn-icon" onClick={logout} aria-label="Chiqish" title="Chiqish">
               <LogoutIcon />
             </button>
@@ -67,8 +89,8 @@ export function Layout() {
       </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-950/95">
-        <div className="grid grid-cols-3">
-          {NAV.map(({ to, label, Icon, end }) => (
+        <div className="grid grid-cols-5">
+          {NAV.map(({ to, short, Icon, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -80,7 +102,7 @@ export function Layout() {
               }
             >
               <Icon className="h-5 w-5" />
-              {label}
+              <span className="max-w-full truncate px-0.5">{short}</span>
             </NavLink>
           ))}
         </div>

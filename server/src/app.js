@@ -8,9 +8,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { requireAuth } from './middleware/auth.js';
+import { catchUpRecurring } from './middleware/recurring.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
 import budgetRoutes from './routes/budget.routes.js';
+import categoryRoutes from './routes/category.routes.js';
+import goalRoutes from './routes/goal.routes.js';
+import recurringRoutes from './routes/recurring.routes.js';
 import summaryRoutes from './routes/summary.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 
@@ -33,6 +37,8 @@ export function createApp() {
 
   app.use(helmet());
   app.use(cors({ origin: env.CLIENT_URL.split(',').map((s) => s.trim()) }));
+  // Import bitta so'rovda 1000 tagacha qator yuboradi, shuning uchun faqat shu yo'lga kattaroq limit.
+  app.use('/api/transactions/import', express.json({ limit: '1mb' }));
   app.use(express.json({ limit: '100kb' }));
 
   app.get('/api/health', (_req, res) => {
@@ -42,9 +48,12 @@ export function createApp() {
 
   app.use('/api', apiLimiter);
   app.use('/api/auth', authRoutes);
-  app.use('/api/transactions', requireAuth, transactionRoutes);
-  app.use('/api/summary', requireAuth, summaryRoutes);
-  app.use('/api/budgets', requireAuth, budgetRoutes);
+  app.use('/api/transactions', requireAuth, catchUpRecurring, transactionRoutes);
+  app.use('/api/summary', requireAuth, catchUpRecurring, summaryRoutes);
+  app.use('/api/budgets', requireAuth, catchUpRecurring, budgetRoutes);
+  app.use('/api/categories', requireAuth, categoryRoutes);
+  app.use('/api/recurring', requireAuth, recurringRoutes);
+  app.use('/api/goals', requireAuth, goalRoutes);
 
   // Production'da frontend build'ini shu serverning o'zi tarqatadi: bitta xizmat, bitta domen, CORS kerak emas.
   if (env.NODE_ENV === 'production' && fs.existsSync(CLIENT_DIST)) {

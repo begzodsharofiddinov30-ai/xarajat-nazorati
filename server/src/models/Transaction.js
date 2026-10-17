@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ALL_CATEGORIES, TYPES } from '../utils/categories.js';
+import { TYPES } from '../utils/categories.js';
 
 const transactionSchema = new mongoose.Schema(
   {
@@ -11,14 +11,22 @@ const transactionSchema = new mongoose.Schema(
       min: 1,
       validate: { validator: Number.isInteger, message: "Summa butun son bo'lishi kerak" },
     },
-    category: { type: String, enum: ALL_CATEGORIES, required: true },
+    // Kategoriya tekshiruvi servis qatlamida: tayyor ro'yxat yoki foydalanuvchining o'z kategoriyasi (c_<id>).
+    category: { type: String, required: true, maxlength: 40 },
     date: { type: Date, required: true },
     note: { type: String, trim: true, maxlength: 200, default: '' },
+    // Takroriy qoidadan avtomatik yaratilgan bo'lsa, qoida _id si.
+    recurring: { type: mongoose.Schema.Types.ObjectId, ref: 'Recurring' },
   },
   { timestamps: true },
 );
 
 transactionSchema.index({ user: 1, date: -1 });
+// Bitta qoida bitta kunga ikki marta tranzaksiya yarata olmaydi (bir vaqtdagi so'rovlar poygasidan himoya).
+transactionSchema.index(
+  { user: 1, recurring: 1, date: 1 },
+  { unique: true, partialFilterExpression: { recurring: { $exists: true } } },
+);
 
 transactionSchema.set('toJSON', {
   versionKey: false,
@@ -26,6 +34,7 @@ transactionSchema.set('toJSON', {
     ret.id = String(ret._id);
     delete ret._id;
     delete ret.user;
+    if (ret.recurring) ret.recurring = String(ret.recurring);
     ret.date = ret.date.toISOString().slice(0, 10);
     return ret;
   },

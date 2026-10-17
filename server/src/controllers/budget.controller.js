@@ -1,17 +1,25 @@
 import { Budget } from '../models/Budget.js';
-import { budgetStatus, getSpentByCategory } from '../services/budgetService.js';
+import { budgetStatus, getSpentSplitByCategory } from '../services/budgetService.js';
+import { assertCategory } from '../services/categoryService.js';
+import { loadForecastContext, projectCategory } from '../services/forecastService.js';
 import { ApiError } from '../utils/ApiError.js';
-import { currentMonth } from '../utils/month.js';
+import { currentMonth, todayUtcStr } from '../utils/month.js';
 
 export async function listBudgets(req, res) {
+  const today = req.valid.query.today ?? todayUtcStr();
   const month = req.valid.query.month ?? currentMonth();
-  const [budgets, spentMap] = await Promise.all([
+  const [budgets, splitMap, forecastCtx] = await Promise.all([
     Budget.find({ user: req.user.id }).sort({ category: 1 }),
-    getSpentByCategory(req.user.id, month),
+    getSpentSplitByCategory(req.user.id, month),
+    loadForecastContext(req.user.id, month, today),
   ]);
 
   const data = budgets.map((b) => {
-    const spent = spentMap.get(b.category) ?? 0;
+    const split = splitMap.get(b.category);
+    const spent = split?.total ?? 0;
+    const status = budgetStatus(spent, b.limit);
+    // Faqat joriy oy uchun: shu tempda oy oxirida qancha bo'lishi (takroriy to'lovlar hisobga olingan).
+    const projected = projectCategory(forecastCtx, b.category, split);
     return {
       id: b.id,
       category: b.category,
@@ -19,7 +27,9 @@ export async function listBudgets(req, res) {
       spent,
       remaining: b.limit - spent,
       percent: Math.round((spent / b.limit) * 100),
-      status: budgetStatus(spent, b.limit),
+      status,
+      projected,
+      projectedExceeds: projected != null && status !== 'exceeded' && projected > b.limit,
     };
   });
 
@@ -28,6 +38,7 @@ export async function listBudgets(req, res) {
 
 export async function upsertBudget(req, res) {
   const { category, limit } = req.valid.body;
+  await assertCategory(req.user.id, 'expense', category);
   const budget = await Budget.findOneAndUpdate(
     { user: req.user.id, category },
     { $set: { limit } },
