@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { amountField, categoryKeyField, dateField, monthField, noteField, phoneRefField, typeField } from './common.js';
+import { amountField, categoryKeyField, dateField, monthField, noteField, refField, typeField } from './common.js';
 
 export { monthField };
 
@@ -9,7 +9,7 @@ export const transactionBodySchema = z.object({
   category: categoryKeyField,
   date: dateField(),
   note: noteField(),
-  phone: phoneRefField,
+  loan: refField,
 });
 
 const SORTS = ['date_desc', 'date_asc', 'amount_desc', 'amount_asc'];
@@ -22,7 +22,7 @@ export const transactionListQuerySchema = z
     to: dateField().optional(),
     type: typeField.optional(),
     category: categoryKeyField.optional(),
-    phone: z.string().regex(/^[0-9a-f]{24}$/).optional(),
+    loan: z.string().regex(/^[0-9a-f]{24}$/).optional(),
     q: z.string().trim().max(100).optional(),
     minAmount: z.coerce.number().int().min(0).optional(),
     maxAmount: z.coerce.number().int().min(0).optional(),

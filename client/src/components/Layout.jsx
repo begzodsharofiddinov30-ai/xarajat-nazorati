@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router';
-import { FlagIcon, HomeIcon, ListIcon, PhoneIcon, RepeatIcon, TargetIcon } from './icons.jsx';
+import { BankIcon, FlagIcon, HomeIcon, ListIcon, RepeatIcon, TargetIcon } from './icons.jsx';
 import { UserMenu } from './UserMenu.jsx';
 
 // label — kompyuterdagi yuqori menyu; short — telefon/planshetdagi pastki menyu (5 ta tugma sig'ishi uchun).
@@ -10,7 +10,7 @@ const NAV = [
   { to: '/recurring', label: 'Takroriy', short: 'Takroriy', Icon: RepeatIcon },
   { to: '/budgets', label: 'Budjetlar', short: 'Budjet', Icon: TargetIcon },
   { to: '/goals', label: 'Maqsadlar', short: 'Maqsad', Icon: FlagIcon },
-  { to: '/mobile', label: 'Mobil aloqa', short: 'Mobil', Icon: PhoneIcon, bottom: false },
+  { to: '/loans', label: 'Kreditlar', short: 'Kredit', Icon: BankIcon, bottom: false },
 ];
 
 export function Layout() {

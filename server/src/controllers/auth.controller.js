@@ -1,10 +1,11 @@
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { Budget } from '../models/Budget.js';
 import { Category } from '../models/Category.js';
 import { Goal } from '../models/Goal.js';
-import { Phone } from '../models/Phone.js';
+import { Loan } from '../models/Loan.js';
 import { Recurring } from '../models/Recurring.js';
 import { Transaction } from '../models/Transaction.js';
 import { User } from '../models/User.js';
@@ -120,7 +121,9 @@ export async function deleteAccount(req, res) {
     Category.deleteMany(owner),
     Recurring.deleteMany(owner),
     Goal.deleteMany(owner),
-    Phone.deleteMany(owner),
+    // Olib tashlangan "Mobil aloqa" bo'limidan qolgan telefon raqamlari (shaxsiy ma'lumot) ham o'chiriladi.
+    mongoose.connection.collection('phones').deleteMany(owner),
+    Loan.deleteMany(owner),
   ]);
   await user.deleteOne();
   res.status(204).end();

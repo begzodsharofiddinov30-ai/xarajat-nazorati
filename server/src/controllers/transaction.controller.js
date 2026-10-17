@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { Transaction } from '../models/Transaction.js';
 import { checkBudget } from '../services/budgetService.js';
 import { assertCategory, loadCategoryLookup } from '../services/categoryService.js';
-import { assertPhone } from '../services/phoneService.js';
+import { assertLoan } from '../services/loanService.js';
 import { ApiError } from '../utils/ApiError.js';
 import { escapeRegex } from '../utils/format.js';
 import { addDays, monthRange, parseDateOnly } from '../utils/month.js';
@@ -30,7 +30,7 @@ const SORTS = {
 };
 
 export async function listTransactions(req, res) {
-  const { month, from, to, type, category, phone, q, minAmount, maxAmount, sort, page, limit } = req.valid.query;
+  const { month, from, to, type, category, loan, q, minAmount, maxAmount, sort, page, limit } = req.valid.query;
 
   const filter = { user: new mongoose.Types.ObjectId(req.user.id) };
   if (from || to) {
@@ -43,7 +43,7 @@ export async function listTransactions(req, res) {
   }
   if (type) filter.type = type;
   if (category) filter.category = category;
-  if (phone) filter.phone = new mongoose.Types.ObjectId(phone);
+  if (loan) filter.loan = new mongoose.Types.ObjectId(loan);
   if (q) filter.note = { $regex: escapeRegex(q), $options: 'i' };
   if (minAmount != null || maxAmount != null) {
     filter.amount = {};
@@ -81,10 +81,10 @@ export async function listTransactions(req, res) {
 export async function createTransaction(req, res) {
   const body = req.valid.body;
   await assertCategory(req.user.id, body.type, body.category);
-  await assertPhone(req.user.id, body.phone, body.category);
+  await assertLoan(req.user.id, body.loan, body.category);
   const tx = await Transaction.create({
     ...body,
-    phone: body.phone ?? undefined,
+    loan: body.loan ?? undefined,
     date: parseDateOnly(body.date),
     user: req.user.id,
   });
@@ -97,10 +97,10 @@ export async function updateTransaction(req, res) {
   const tx = await Transaction.findOne(ownedFilter(req));
   if (!tx) throw notFound();
   await assertCategory(req.user.id, body.type, body.category);
-  await assertPhone(req.user.id, body.phone, body.category);
+  await assertLoan(req.user.id, body.loan, body.category);
 
-  // PUT to'liq almashtiradi: raqam yuborilmasa bog'lanish olib tashlanadi.
-  tx.set({ ...body, phone: body.phone ?? undefined, date: parseDateOnly(body.date) });
+  // PUT to'liq almashtiradi: kredit yuborilmasa bog'lanish olib tashlanadi.
+  tx.set({ ...body, loan: body.loan ?? undefined, date: parseDateOnly(body.date) });
   await tx.save();
 
   res.json({ data: tx, warning: await warningFor(req, tx) });

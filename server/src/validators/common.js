@@ -33,8 +33,8 @@ export const expenseCategoryKeyField = z
 
 export const noteField = (max = 200) => z.string().trim().max(max, `Izoh ${max} belgidan oshmasin`).optional().default('');
 
-// Ixtiyoriy telefon raqami bog'lanishi (Phone _id). null — bog'lanmagan.
-export const phoneRefField = z
+// Ixtiyoriy bog'lanish (masalan, Loan _id). null — bog'lanmagan.
+export const refField = z
   .string()
   .regex(/^[0-9a-f]{24}$/, "Raqam noto'g'ri")
   .nullable()

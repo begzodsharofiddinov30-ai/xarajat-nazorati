@@ -17,13 +17,14 @@ const transactionSchema = new mongoose.Schema(
     note: { type: String, trim: true, maxlength: 200, default: '' },
     // Takroriy qoidadan avtomatik yaratilgan bo'lsa, qoida _id si.
     recurring: { type: mongoose.Schema.Types.ObjectId, ref: 'Recurring' },
-    // Mobil aloqa to'lovi qaysi telefon raqamiga (Phone) qilingani.
-    phone: { type: mongoose.Schema.Types.ObjectId, ref: 'Phone' },
+    // Kredit to'lovi qaysi kreditga (Loan) tegishli.
+    loan: { type: mongoose.Schema.Types.ObjectId, ref: 'Loan' },
   },
   { timestamps: true },
 );
 
 transactionSchema.index({ user: 1, date: -1 });
+transactionSchema.index({ user: 1, loan: 1 }, { sparse: true });
 // Bitta qoida bitta kunga ikki marta tranzaksiya yarata olmaydi (bir vaqtdagi so'rovlar poygasidan himoya).
 transactionSchema.index(
   { user: 1, recurring: 1, date: 1 },
@@ -36,7 +37,7 @@ transactionSchema.set('toJSON', {
     ret.id = String(ret._id);
     delete ret._id;
     delete ret.user;
-    if (ret.phone) ret.phone = String(ret.phone);
+    if (ret.loan) ret.loan = String(ret.loan);
     if (ret.recurring) ret.recurring = String(ret.recurring);
     ret.date = ret.date.toISOString().slice(0, 10);
     return ret;

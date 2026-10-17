@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { phonesApi } from '../api/phones.js';
+import { loansApi } from '../api/loans.js';
 import { transactionsApi } from '../api/transactions.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { CATEGORY_ICONS, CATEGORY_LABELS, categoriesFor } from '../utils/categories.js';
 import { todayStr } from '../utils/month.js';
-import { formatPhone } from '../utils/phone.js';
 import { AmountInput } from './AmountInput.jsx';
 import { TrashIcon } from './icons.jsx';
 import { Modal } from './Modal.jsx';
@@ -23,20 +22,20 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
     category: initial?.category ?? 'food',
     date: initial?.date ?? todayStr(),
     note: initial?.note ?? '',
-    phone: initial?.phone ?? null,
+    loan: initial?.loan ?? null,
   }));
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
-  // "Mobil aloqa" tanlanganda foydalanuvchining telefon raqamlari bir marta yuklanadi.
-  const [phones, setPhones] = useState(null);
+  // "Kredit to'lovi" tanlanganda foydalanuvchining ochiq kreditlari bir marta yuklanadi.
+  const [loans, setLoans] = useState(null);
 
   useEffect(() => {
-    if (form.category !== 'mobile' || phones) return;
-    phonesApi.list().then(
-      (r) => setPhones(r.data),
-      () => setPhones([]),
+    if (form.category !== 'loan' || loans) return;
+    loansApi.list().then(
+      (r) => setLoans(r.data.filter((l) => l.status !== 'closed' || l.id === initial?.loan)),
+      () => setLoans([]),
     );
-  }, [form.category, phones]);
+  }, [form.category, loans, initial?.loan]);
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
   const setType = (type) =>
@@ -53,7 +52,7 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
     setBusy(true);
     setErrors({});
     try {
-      const body = { ...form, phone: form.category === 'mobile' ? form.phone : null };
+      const body = { ...form, loan: form.category === 'loan' ? form.loan : null };
       const res = editing ? await transactionsApi.update(initial.id, body) : await transactionsApi.create(body);
       if (res.warning) toast(res.warning.message, 'warning');
       else toast(editing ? 'Tranzaksiya yangilandi' : "Tranzaksiya qo'shildi");
@@ -137,35 +136,34 @@ export function TransactionForm({ initial, onClose, onSaved, onDelete }) {
           </Link>
         </fieldset>
 
-        {form.category === 'mobile' && (
+        {form.category === 'loan' && (
           <fieldset>
-            <legend className="label">Qaysi raqamga</legend>
-            {phones === null ? (
+            <legend className="label">Qaysi kredit</legend>
+            {loans === null ? (
               <div className="h-9 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
             ) : (
               <div className="flex flex-wrap gap-2">
-                {[{ id: null, label: "Ko'rsatilmagan" }, ...phones].map((p) => (
+                {[{ id: null, name: "Ko'rsatilmagan" }, ...loans].map((l) => (
                   <button
-                    key={p.id ?? 'none'}
+                    key={l.id ?? 'none'}
                     type="button"
-                    onClick={() => set({ phone: p.id })}
-                    aria-pressed={form.phone === p.id}
-                    title={p.number ? formatPhone(p.number) : undefined}
+                    onClick={() => set({ loan: l.id })}
+                    aria-pressed={form.loan === l.id}
                     className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
-                      form.phone === p.id
+                      form.loan === l.id
                         ? 'border-brand-500 bg-brand-50 text-brand-800 dark:bg-brand-500/10 dark:text-brand-300'
                         : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {p.label}
+                    {l.name}
                   </button>
                 ))}
-                <Link to="/mobile" onClick={onClose} className="self-center text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-                  + Raqam qo'shish
+                <Link to="/loans" onClick={onClose} className="self-center text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                  + Kredit qo'shish
                 </Link>
               </div>
             )}
-            <FieldError>{errors.phone}</FieldError>
+            <FieldError>{errors.loan}</FieldError>
           </fieldset>
         )}
 

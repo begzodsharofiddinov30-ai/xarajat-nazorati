@@ -160,8 +160,10 @@ Barcha himoyalangan endpoint'lar `Authorization: Bearer <token>` sarlavhasini ta
 | GET, POST | `/api/goals` | Maqsad: `{ name, targetAmount, deadline? }` → `saved`, `percent`, `remaining`, `monthlyNeeded` |
 | PUT, DELETE | `/api/goals/:id` | |
 | POST | `/api/goals/:id/contributions` | `{ amount, date?, note? }`: musbat — qo'shish, manfiy — qaytarib olish |
-| GET | `/api/phones?month=YYYY-MM` | Mobil aloqa: raqamlar + shu oy to'langan (`paid`), `lastPayment`, `autoPay`; `meta`: `total`, `unassigned`, 6 oylik `trend` |
-| POST, PUT, DELETE | `/api/phones[/:id]` | Raqam: `{ label, number, operator? }`. Operator raqamdan aniqlanadi; o'chirilsa to'lovlar qoladi |
+| GET | `/api/loans?today=` | Kreditlar: `remaining`, `next`, `status` (active/overdue/closed), `autoPay`; `meta`: jami qolgan qarz, eng yaqin to'lov |
+| GET | `/api/loans/:id?today=` | Kredit + to'liq to'lov jadvali (har oy holati bilan) va to'lovlar tarixi |
+| POST, PUT, DELETE | `/api/loans[/:id]` | `{ name, lender?, kind, principal, annualRate, termMonths, firstPaymentDate, method, closed? }` |
+| POST | `/api/loans/:id/payments` | `{ amount?, date?, note? }`: "Kredit to'lovi" xarajati; summa berilmasa keyingi to'lov |
 | DELETE | `/api/goals/:id/contributions/:cid` | |
 
 **Xatolar** doim bir xil formatda qaytadi:
@@ -178,6 +180,7 @@ Barcha himoyalangan endpoint'lar `Authorization: Bearer <token>` sarlavhasini ta
 - **Takroriy tranzaksiyalar** alohida rejalashtiruvchi (cron) talab qilmaydi: ma'lumot o'qiladigan so'rovlardan oldin yetishmayotgan yozuvlar yaratiladi. Serverless muhitda doimiy ishlaydigan jarayon yo'q, shunday bo'lsa ham hech narsa o'tib ketmaydi. `(user, recurring, date)` bo'yicha unikal indeks bir kunga ikki marta yozishga yo'l qo'ymaydi. Server sanasi UTC bo'yicha, shuning uchun Toshkentda yozuv ertalab soat 05:00 da paydo bo'ladi.
 - **O'z kategoriyalar.** Tranzaksiyada kalit sifatida `c_<id>` saqlanadi. Ishlatilayotgan kategoriya o'chirilmaydi, shunda eski yozuvlar nomsiz qolmaydi.
 - **Google orqali kirish** (Google Identity Services). Kirish sahifasida qurilmadagi Google akkauntlar o'zi taklif qilinadi (One Tap), tugma esa akkaunt tanlash oynasini ochadi. Server ID tokenni Google'ning ochiq kalitlari bilan qo'shimcha paketsiz tekshiradi (`server/src/utils/googleToken.js`), faqat tasdiqlangan emaillar qabul qilinadi. Shu emaildagi mavjud hisobga bog'lanadi. Bunda email avval tasdiqlanmagan bo'lsa, eski parol va sessiyalar bekor qilinadi: begona emailni oldindan band qilib hisobni egallab olishning oldi olinadi. O'rnatilgan ilovada (iPhone bosh ekrani, Android ilova) popup o'rniga redirect usuli ishlatiladi (`POST /api/auth/google/redirect`, CSRF tekshiruvi bilan).
+- **Kreditlar.** Jadval saqlanmaydi, parametrlardan har safar hisoblanadi (`server/src/utils/loan.js`): annuitet yoki differensial, foiz qoldiqdan oylik. Annuitet yuqoriga yaxlitlanadi va oxirgi to'lov biroz kichik bo'ladi, shunda bir xil summali avtomatik to'lov kreditni to'liq yopadi. To'lovlar oddiy xarajat ("Kredit to'lovi"), shuning uchun balans, budjet va prognozga tushadi.
 - **Sessiyalar.** JWT ichida `ver` bor va u foydalanuvchining `tokenVersion` i bilan solishtiriladi: parol almashtirilganda yoki "boshqa qurilmalardan chiqish" bosilganda eski tokenlar darhol yaroqsiz bo'ladi.
 - **CSV import** qatorlarni alohida tekshiradi: yaroqlilari saqlanadi, yaroqsizlari sabab bilan qaytadi. Takrorlar (sana, tur, summa, kategoriya va izohi bir xil) o'tkazib yuboriladi, shuning uchun bir faylni ikki marta yuklash xavfsiz.
 - **Maqsadlar** tranzaksiyalar va balansga ta'sir qilmaydi: jamg'arma yozuvlari faqat shu maqsad uchun hisoblanadi.

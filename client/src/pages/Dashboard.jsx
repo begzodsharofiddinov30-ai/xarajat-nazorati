@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { formatSom } from '../utils/format.js';
 import { budgetsApi } from '../api/budgets.js';
+import { loansApi } from '../api/loans.js';
 import { summaryApi } from '../api/summary.js';
 import { transactionsApi } from '../api/transactions.js';
 import { BudgetProgress } from '../components/BudgetProgress.jsx';
@@ -20,7 +21,7 @@ import { TransactionItem } from '../components/TransactionItem.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMonth } from '../context/MonthContext.jsx';
 import { useAsync } from '../hooks/useAsync.js';
-import { shiftMonth } from '../utils/month.js';
+import { dateLabel, shiftMonth } from '../utils/month.js';
 
 const STATUS_ORDER = { exceeded: 0, warning: 1, ok: 2 };
 
@@ -67,13 +68,17 @@ export default function Dashboard() {
   const trend = useAsync(() => summaryApi.trend(month, 6), [month]);
   const budgets = useAsync(() => budgetsApi.list(month), [month]);
   const recent = useAsync(() => transactionsApi.list({ month, limit: 5 }), [month]);
+  const loans = useAsync(() => loansApi.list(), []);
 
   const reloadAll = () => {
     summary.reload();
     budgets.reload();
     recent.reload();
     trend.reload();
+    loans.reload();
   };
+
+  const loanMeta = loans.data?.meta;
 
   const s = summary.data;
   const empty = s && s.transactionCount === 0;
@@ -125,18 +130,29 @@ export default function Dashboard() {
 
           <ForecastCard summary={s} previous={previous.data} budgets={budgets.data ?? []} />
 
-          <Link to="/mobile" className="card flex items-center gap-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
+          {/* Kreditlar: bor bo'lsa qolgan qarz va eng yaqin to'lov, bo'lmasa qo'shishga taklif. */}
+          <Link to="/loans" className="card flex items-center gap-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-xl dark:bg-slate-800" aria-hidden="true">
-              📱
+              🏦
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-semibold">Mobil aloqa</span>
-              <span className="block text-sm text-slate-500 dark:text-slate-400">Telefon balansi to'lovlari raqamlar bo'yicha</span>
+              <span className="block font-semibold">Kreditlar</span>
+              <span className={`block truncate text-sm ${loanMeta?.overdueCount ? 'font-medium text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                {!loanMeta?.activeCount
+                  ? "Kredit yoki muddatli to'lovni qo'shing"
+                  : loanMeta.overdueCount
+                    ? `${loanMeta.overdueCount} ta kredit bo'yicha to'lov kechikkan`
+                    : loanMeta.nextPayment
+                      ? `Keyingi to'lov: ${dateLabel(loanMeta.nextPayment.date)}, ${formatSom(loanMeta.nextPayment.amount)}`
+                      : `${loanMeta.activeCount} ta faol kredit`}
+              </span>
             </span>
-            <span className="shrink-0 text-right">
-              <span className="block font-semibold tabular-nums">{formatSom(s?.byCategory.find((c) => c.category === 'mobile')?.total ?? 0)}</span>
-              <span className="block text-xs text-slate-500 dark:text-slate-400">shu oy</span>
-            </span>
+            {loanMeta?.activeCount > 0 && (
+              <span className="shrink-0 text-right">
+                <span className="block font-semibold tabular-nums">{formatSom(loanMeta.remaining)}</span>
+                <span className="block text-xs text-slate-500 dark:text-slate-400">qolgan qarz</span>
+              </span>
+            )}
           </Link>
 
           <div className="grid gap-4 md:grid-cols-2">

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { Recurring } from '../models/Recurring.js';
 import { materializeRecurring } from '../services/recurringService.js';
 import { assertCategory } from '../services/categoryService.js';
-import { assertPhone } from '../services/phoneService.js';
+import { assertLoan } from '../services/loanService.js';
 import { ApiError } from '../utils/ApiError.js';
 import { parseDateOnly, todayUtcStr } from '../utils/month.js';
 import { firstIndexOnOrAfter, occurrenceDate } from '../utils/recurrence.js';
@@ -31,10 +31,10 @@ export async function listRecurring(req, res) {
 export async function createRecurring(req, res) {
   const { startDate, endDate, ...rest } = req.valid.body;
   await assertCategory(req.user.id, rest.type, rest.category);
-  await assertPhone(req.user.id, rest.phone, rest.category);
+  await assertLoan(req.user.id, rest.loan, rest.category);
   const rule = await Recurring.create({
     ...rest,
-    phone: rest.phone ?? undefined,
+    loan: rest.loan ?? undefined,
     user: req.user.id,
     startDate: parseDateOnly(startDate),
     endDate: endDate ? parseDateOnly(endDate) : null,
@@ -50,13 +50,13 @@ export async function updateRecurring(req, res) {
   const rule = await Recurring.findOne(ownedFilter(req));
   if (!rule) throw notFound();
   await assertCategory(req.user.id, rest.type, rest.category);
-  await assertPhone(req.user.id, rest.phone, rest.category);
+  await assertLoan(req.user.id, rest.loan, rest.category);
 
   const newStart = parseDateOnly(startDate);
   const scheduleChanged =
     newStart.getTime() !== rule.startDate.getTime() || rest.frequency !== rule.frequency;
 
-  rule.set({ ...rest, phone: rest.phone ?? undefined, startDate: newStart, endDate: endDate ? parseDateOnly(endDate) : null });
+  rule.set({ ...rest, loan: rest.loan ?? undefined, startDate: newStart, endDate: endDate ? parseDateOnly(endDate) : null });
   if (scheduleChanged) {
     rule.nextIndex = firstIndexOnOrAfter(newStart, rest.frequency, parseDateOnly(todayUtcStr()));
   }

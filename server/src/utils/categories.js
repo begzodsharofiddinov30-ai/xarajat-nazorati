@@ -10,6 +10,7 @@ export const EXPENSE_CATEGORIES = [
   'entertainment',
   'clothing',
   'mobile',
+  'loan',
   'other',
 ];
 
@@ -27,6 +28,7 @@ export const CATEGORY_LABELS = {
   entertainment: "Ko'ngilochar",
   clothing: 'Kiyim',
   mobile: 'Mobil aloqa',
+  loan: "Kredit to'lovi",
   other: 'Boshqa',
   salary: 'Maosh',
   freelance: 'Frilans',

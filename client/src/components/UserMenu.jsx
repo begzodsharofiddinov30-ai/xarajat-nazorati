@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { InstallButton } from './InstallButton.jsx';
-import { LogoutIcon, MonitorIcon, MoonIcon, PhoneIcon, SettingsIcon, SunIcon, TagIcon } from './icons.jsx';
+import { BankIcon, LogoutIcon, MonitorIcon, MoonIcon, SettingsIcon, SunIcon, TagIcon } from './icons.jsx';
 
 const THEMES = [
   ['system', 'Tizim', MonitorIcon],
@@ -14,7 +14,7 @@ const THEMES = [
 const LINKS = [
   ['/settings', 'Sozlamalar', SettingsIcon],
   ['/categories', 'Kategoriyalar', TagIcon],
-  ['/mobile', 'Mobil aloqa', PhoneIcon],
+  ['/loans', 'Kreditlar', BankIcon],
 ];
 
 const initials = (name = '') =>
