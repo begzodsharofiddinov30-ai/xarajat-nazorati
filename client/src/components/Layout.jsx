@@ -1,10 +1,8 @@
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
-import { promptInstall, usePwa } from '../pwa.js';
+import { InstallButton } from './InstallButton.jsx';
 import {
-  DownloadIcon,
   FlagIcon,
   HomeIcon,
   ListIcon,
@@ -36,12 +34,6 @@ export function Layout() {
   const { user, logout } = useAuth();
   const { theme, cycle } = useTheme();
   const T = THEMES[theme];
-  const { canInstall } = usePwa();
-  const toast = useToast();
-
-  async function install() {
-    if (await promptInstall()) toast("Ilova o'rnatildi. Uni bosh ekrandan ochishingiz mumkin");
-  }
 
   return (
     <div className="min-h-dvh">
@@ -75,11 +67,7 @@ export function Layout() {
             <span className="mr-2 hidden max-w-40 truncate text-sm text-slate-500 sm:inline dark:text-slate-400">
               {user?.name}
             </span>
-            {canInstall && (
-              <button className="btn-icon text-brand-600 dark:text-brand-400" onClick={install} aria-label="Ilovani o'rnatish" title="Ilovani o'rnatish">
-                <DownloadIcon />
-              </button>
-            )}
+            <InstallButton variant="icon" />
             <button className="btn-icon" onClick={cycle} aria-label={T.label} title={T.label}>
               <T.Icon />
             </button>

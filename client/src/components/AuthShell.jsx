@@ -1,5 +1,6 @@
 import { useTheme } from '../context/ThemeContext.jsx';
 import { MonitorIcon, MoonIcon, SunIcon } from './icons.jsx';
+import { InstallButton } from './InstallButton.jsx';
 
 const ICONS = { system: MonitorIcon, light: SunIcon, dark: MoonIcon };
 
@@ -21,6 +22,9 @@ export function AuthShell({ title, subtitle, children, footer }) {
         </div>
         <div className="card p-6">{children}</div>
         <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">{footer}</p>
+        <p className="mt-6 text-center text-sm">
+          <InstallButton variant="link" />
+        </p>
       </div>
     </div>
   );

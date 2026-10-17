@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { authApi } from '../api/auth.js';
 import { ChevronRightIcon, DownloadIcon, TagIcon } from '../components/icons.jsx';
+import { InstallButton } from '../components/InstallButton.jsx';
 import { Modal } from '../components/Modal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import { isIos, promptInstall, usePwa } from '../pwa.js';
+import { usePwa } from '../pwa.js';
 
 function FieldError({ children }) {
   return children ? <p className="mt-1 text-sm text-red-600 dark:text-red-400">{children}</p> : null;
@@ -146,15 +147,9 @@ function SessionsCard() {
   );
 }
 
-// Ilovani telefon yoki kompyuterga o'rnatish: Android/Chrome'da bitta tugma, iPhone'da qo'lda bajariladigan qadamlar.
+// Ilovani telefon yoki kompyuterga o'rnatish.
 function InstallCard() {
-  const { canInstall, installed } = usePwa();
-  const toast = useToast();
-
-  async function install() {
-    if (await promptInstall()) toast("Ilova o'rnatildi. Uni bosh ekrandan ochishingiz mumkin");
-  }
-
+  const { installed } = usePwa();
   return (
     <section className="card">
       <div className="flex items-start gap-3">
@@ -163,42 +158,14 @@ function InstallCard() {
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold">Ilova</h2>
-          {installed ? (
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Ilova o'rnatilgan. Yangi versiyalar avtomatik keladi.
-            </p>
-          ) : (
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Telefoningizga o'rnating: bosh ekranda o'z ikonkasi bilan to'liq ekranda ochiladi, internet sekin bo'lsa ham tez yuklanadi.
-            </p>
-          )}
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {installed
+              ? "Ilova o'rnatilgan. Yangi versiyalar avtomatik keladi."
+              : "Telefoningizga o'rnating: bosh ekranda o'z ikonkasi bilan to'liq ekranda ochiladi, internet sekin bo'lsa ham tez yuklanadi."}
+          </p>
         </div>
       </div>
-
-      {!installed && canInstall && (
-        <button className="btn-primary mt-4 w-full sm:w-auto" onClick={install}>
-          Ilovani o'rnatish
-        </button>
-      )}
-
-      {!installed && !canInstall && (
-        <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm text-slate-600 dark:text-slate-300">
-          {isIos() ? (
-            <>
-              <li>Saytni <b>Safari</b> brauzerida oching.</li>
-              <li>Pastdagi <b>Ulashish</b> tugmasini bosing (kvadrat va yuqoriga strelka).</li>
-              <li><b>Bosh ekranga qo'shish</b> (Add to Home Screen) ni tanlang.</li>
-              <li>O'ng yuqoridagi <b>Qo'shish</b> ni bosing.</li>
-            </>
-          ) : (
-            <>
-              <li>Saytni <b>Chrome</b> (yoki Edge, Samsung Internet) brauzerida oching.</li>
-              <li>Brauzer menyusini oching (<b>⋮</b>).</li>
-              <li><b>Ilovani o'rnatish</b> yoki <b>Bosh ekranga qo'shish</b> ni tanlang.</li>
-            </>
-          )}
-        </ol>
-      )}
+      <InstallButton className="mt-4 w-full sm:w-auto" />
     </section>
   );
 }

@@ -12,6 +12,21 @@ export const isStandalone = () =>
 export const isIos = () =>
   /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+// Qaysi brauzer ekanini aniqlaydi: o'rnatish yo'riqnomasi har birida boshqacha.
+// Faqat Chrome/Edge/Samsung "o'rnatish" oynasini dastur orqali ko'rsata oladi; iPhone'da va boshqa brauzerlarda qo'lda.
+export function browserKind() {
+  const ua = navigator.userAgent;
+  // Telegram, Instagram, Facebook ichidagi brauzer (Android WebView'da "; wv)" bo'ladi) ilovani o'rnata olmaydi.
+  if (/Telegram|Instagram|FBAN|FBAV|MicroMessenger|Line\//i.test(ua) || /; wv\)/.test(ua)) return 'in-app';
+  if (isIos()) return /CriOS|FxiOS|EdgiOS|YaBrowser|OPiOS/i.test(ua) ? 'ios-other' : 'ios-safari';
+  if (/Android/i.test(ua)) {
+    if (/SamsungBrowser/i.test(ua)) return 'samsung';
+    if (/YaBrowser|MiuiBrowser|XiaoMi|OPR\/|Firefox|UCBrowser|HeyTap|VivoBrowser/i.test(ua)) return 'android-other';
+    return 'android-chrome';
+  }
+  return 'desktop';
+}
+
 let state = { canInstall: false, installed: isStandalone(), updateReady: false };
 
 function set(patch) {
