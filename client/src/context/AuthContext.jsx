@@ -33,6 +33,13 @@ export function AuthProvider({ children }) {
     checkSession();
   }, [logout, checkSession]);
 
+  // Ilova internetsiz ochilgan bo'lsa, internet qaytishi bilan sessiya qayta tekshiriladi.
+  useEffect(() => {
+    if (status !== 'offline') return;
+    window.addEventListener('online', checkSession);
+    return () => window.removeEventListener('online', checkSession);
+  }, [status, checkSession]);
+
   const finish = useCallback(({ token, user: u }) => {
     setToken(token);
     setUser(u);

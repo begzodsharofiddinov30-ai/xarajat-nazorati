@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { authApi } from '../api/auth.js';
-import { ChevronRightIcon, TagIcon } from '../components/icons.jsx';
+import { ChevronRightIcon, DownloadIcon, TagIcon } from '../components/icons.jsx';
 import { Modal } from '../components/Modal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { isIos, promptInstall, usePwa } from '../pwa.js';
 
 function FieldError({ children }) {
   return children ? <p className="mt-1 text-sm text-red-600 dark:text-red-400">{children}</p> : null;
@@ -145,6 +146,63 @@ function SessionsCard() {
   );
 }
 
+// Ilovani telefon yoki kompyuterga o'rnatish: Android/Chrome'da bitta tugma, iPhone'da qo'lda bajariladigan qadamlar.
+function InstallCard() {
+  const { canInstall, installed } = usePwa();
+  const toast = useToast();
+
+  async function install() {
+    if (await promptInstall()) toast("Ilova o'rnatildi. Uni bosh ekrandan ochishingiz mumkin");
+  }
+
+  return (
+    <section className="card">
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white">
+          <DownloadIcon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold">Ilova</h2>
+          {installed ? (
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Ilova o'rnatilgan. Yangi versiyalar avtomatik keladi.
+            </p>
+          ) : (
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Telefoningizga o'rnating: bosh ekranda o'z ikonkasi bilan to'liq ekranda ochiladi, internet sekin bo'lsa ham tez yuklanadi.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {!installed && canInstall && (
+        <button className="btn-primary mt-4 w-full sm:w-auto" onClick={install}>
+          Ilovani o'rnatish
+        </button>
+      )}
+
+      {!installed && !canInstall && (
+        <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm text-slate-600 dark:text-slate-300">
+          {isIos() ? (
+            <>
+              <li>Saytni <b>Safari</b> brauzerida oching.</li>
+              <li>Pastdagi <b>Ulashish</b> tugmasini bosing (kvadrat va yuqoriga strelka).</li>
+              <li><b>Bosh ekranga qo'shish</b> (Add to Home Screen) ni tanlang.</li>
+              <li>O'ng yuqoridagi <b>Qo'shish</b> ni bosing.</li>
+            </>
+          ) : (
+            <>
+              <li>Saytni <b>Chrome</b> (yoki Edge, Samsung Internet) brauzerida oching.</li>
+              <li>Brauzer menyusini oching (<b>⋮</b>).</li>
+              <li><b>Ilovani o'rnatish</b> yoki <b>Bosh ekranga qo'shish</b> ni tanlang.</li>
+            </>
+          )}
+        </ol>
+      )}
+    </section>
+  );
+}
+
 function DeleteAccount() {
   const { logout } = useAuth();
   const toast = useToast();
@@ -207,6 +265,8 @@ export default function Settings() {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <h1 className="text-lg font-semibold">Sozlamalar</h1>
+
+      <InstallCard />
 
       <Link to="/categories" className="card flex items-center gap-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
         <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">

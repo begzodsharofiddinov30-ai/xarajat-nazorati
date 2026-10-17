@@ -7,4 +7,7 @@
   } catch (e) {}
   var dark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.classList.toggle('dark', dark);
+  // Telefon status paneli rangi mavzuga mos bo'lishi uchun.
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', dark ? '#09090b' : '#ffffff');
 })();

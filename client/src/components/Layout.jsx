@@ -1,7 +1,10 @@
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { promptInstall, usePwa } from '../pwa.js';
 import {
+  DownloadIcon,
   FlagIcon,
   HomeIcon,
   ListIcon,
@@ -33,10 +36,16 @@ export function Layout() {
   const { user, logout } = useAuth();
   const { theme, cycle } = useTheme();
   const T = THEMES[theme];
+  const { canInstall } = usePwa();
+  const toast = useToast();
+
+  async function install() {
+    if (await promptInstall()) toast("Ilova o'rnatildi. Uni bosh ekrandan ochishingiz mumkin");
+  }
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
+      <header className="sticky top-0 z-30 border-b pt-[env(safe-area-inset-top)] border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-4 px-4">
           <NavLink to="/" className="flex items-center gap-2 font-bold">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">X</span>
@@ -66,6 +75,11 @@ export function Layout() {
             <span className="mr-2 hidden max-w-40 truncate text-sm text-slate-500 sm:inline dark:text-slate-400">
               {user?.name}
             </span>
+            {canInstall && (
+              <button className="btn-icon text-brand-600 dark:text-brand-400" onClick={install} aria-label="Ilovani o'rnatish" title="Ilovani o'rnatish">
+                <DownloadIcon />
+              </button>
+            )}
             <button className="btn-icon" onClick={cycle} aria-label={T.label} title={T.label}>
               <T.Icon />
             </button>
